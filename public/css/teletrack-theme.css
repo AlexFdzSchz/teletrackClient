@@ -1,0 +1,80 @@
+/* Sobrescribbir colores personalizados para bootstrap */
+:root {
+  --bs-primary: #5865F2;       
+  --bs-primary-rgb: 88, 101, 242;
+  
+  --bs-secondary: #4F545C;     
+  --bs-secondary-rgb: 79, 84, 92;
+  
+  --bs-success: #57F287;       
+  --bs-success-rgb: 87, 242, 135;
+  
+  --bs-danger: #ED4245;        
+  --bs-danger-rgb: 237, 66, 69;
+  
+  --bs-warning: #FEE75C;       
+  --bs-warning-rgb: 254, 231, 92;
+  
+  --bs-info: #5865F2;          
+  --bs-info-rgb: 88, 101, 242;
+  
+  --bs-light: #F2F3F5;         
+  --bs-light-rgb: 242, 243, 245;
+  
+  --bs-dark: #36393F;          
+  --bs-dark-rgb: 54, 57, 63;
+}
+
+/* Sobrescribir colores de botones */
+.btn-primary, .btn-primary:hover, .btn-primary:focus {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.btn-secondary, .btn-secondary:hover, .btn-secondary:focus {
+  background-color: var(--bs-secondary);
+  border-color: var(--bs-secondary);
+}
+
+.btn-success, .btn-success:hover, .btn-success:focus {
+  background-color: var(--bs-success);
+  border-color: var(--bs-success);
+}
+
+.btn-danger, .btn-danger:hover, .btn-danger:focus {
+  background-color: var(--bs-danger);
+  border-color: var(--bs-danger);
+}
+
+.btn-warning, .btn-warning:hover, .btn-warning:focus {
+  background-color: var(--bs-warning);
+  border-color: var(--bs-warning);
+}
+
+.btn-info, .btn-info:hover, .btn-info:focus {
+  background-color: var(--bs-info);
+  border-color: var(--bs-info);
+  color: #fff;
+}
+
+/* Sobrescribir colores de fondos */
+.bg-primary { background-color: var(--bs-primary) !important; }
+.bg-secondary { background-color: var(--bs-secondary) !important; }
+.bg-success { background-color: var(--bs-success) !important; }
+.bg-danger { background-color: var(--bs-danger) !important; }
+.bg-warning { background-color: var(--bs-warning) !important; }
+.bg-info { background-color: var(--bs-info) !important; }
+.bg-light { background-color: var(--bs-light) !important; }
+.bg-dark { background-color: var(--bs-dark) !important; }
+
+/* Sobrescribir colores de texto */
+.text-primary { color: var(--bs-primary) !important; }
+.text-secondary { color: var(--bs-secondary) !important; }
+.text-success { color: var(--bs-success) !important; }
+.text-danger { color: var(--bs-danger) !important; }
+.text-warning { color: var(--bs-warning) !important; }
+.text-info { color: var(--bs-info) !important; }
+.text-light { color: var(--bs-light) !important; }
+.text-dark { color: var(--bs-dark) !important; }
+
+
