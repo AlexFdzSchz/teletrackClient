@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleTrack - Login</title>
+    <link href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../../public/css/teletrack-theme.css" rel="stylesheet">
+    <script src="../../config.js"></script>
+    <script src="../../public/js/auth.js"></script>
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        #loginError {
+            display: none;
+        }
+    </style>
+    
+</head>
+<body class="bg-dark">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="bg-secondary rounded p-4 shadow mx-auto" style="max-width: 400px;">
+                    <div class="text-center mb-4">
+                        <h2 class="text-primary fw-bold">TeleTrack</h2>
+                        <p class="text-light">Inicia sesión para continuar</p>
+                    </div>
+                    
+                    <div class="alert alert-danger" id="loginError" role="alert">
+                        Correo electrónico o contraseña incorrectos.
+                    </div>
+                    
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label text-light">Correo electrónico</label>
+                            <input type="email" class="form-control bg-dark text-light border-primary" id="email" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label text-light">Contraseña</label>
+                            <input type="password" class="form-control bg-dark text-light border-primary" id="password" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">Iniciar sesión</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar si ya está autenticado
+            if (isAuthenticated()) {
+                window.location.href = '/index.html';
+                return;
+            }
+            
+            // Manejar envío del formulario
+            document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const errorElement = document.getElementById('loginError');
+                
+                try {
+                    // Ocultar mensaje de error previo
+                    errorElement.style.display = 'none';
+                    
+                    // Intentar login
+                    await login(email, password);
+                    
+                    // Redirigir a la página principal tras éxito
+                    window.location.href = '../..';
+                } catch (error) {
+                    // Mostrar mensaje de error
+                    errorElement.textContent = error.message || 'Error al iniciar sesión';
+                    errorElement.style.display = 'block';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

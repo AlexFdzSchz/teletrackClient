@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleTrack - Inicio</title>
+    <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="public/css/teletrack-theme.css" rel="stylesheet">
+    <script src="config.js"></script>
+    <script src="public/js/auth.js"></script>
+    <script src="public/js/authCheck.js"></script>
+    <script>
+        // Verificar autenticación cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function () {
+            const userData = checkAuthentication('content');
+            if (userData) {
+                console.log('Bienvenido', userData.firstName);
+            }
+        });
+    </script>
+</head>
+
+<body class="bg-dark">
+    <div id="content" style="display: none;">
+        <div class="container mt-5">
+            <h1 class="text-light">Bienvenido a TeleTrack</h1>
+            <p class="text-light">Estás autenticado correctamente.</p>
+            <button class="btn btn-danger" onclick="logout()">Cerrar sesión</button>
+        </div>
+    </div>
+</body>
+
+</html>
