@@ -1,3 +1,6 @@
+/* Importar fuente Inter de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 /* Sobrescribbir colores personalizados para bootstrap */
 :root {
   --bs-primary: #5865F2;       
@@ -23,6 +26,15 @@
   
   --bs-dark: #36393F;          
   --bs-dark-rgb: 54, 57, 63;
+
+  /* Configuración de fuente global */
+  --bs-font-sans-serif: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --bs-body-font-family: var(--bs-font-sans-serif);
+}
+
+/* Aplicación global de la fuente Inter */
+body {
+  font-family: var(--bs-font-sans-serif);
 }
 
 /* Sobrescribir colores de botones */
