@@ -10,7 +10,38 @@ function isAuthenticated() {
 }
 
 /**
- * Cierra la sesión del usuario
+ * Verifica si el usuario está autenticado y muestra el contenido apropiadamente.
+ * Si el usuario no está autenticado, redirige a login.html.
+ * @returns {Object|null} - Datos del usuario si está autenticado, null en caso contrario
+ */
+function checkAuthentication() {
+    if (!isAuthenticated()) {
+        console.log('Usuario no autenticado, redirigiendo a login.html');
+        
+        window.location.href = 'login.html';
+        return null;
+    } else {
+        const contentElement = document.getElementById('content');
+        if (contentElement) {
+            contentElement.classList.remove('d-none');
+        }
+        
+        // Obtener y devolver los datos del usuario
+        try {
+            const userDataString = localStorage.getItem('userData');
+            if (userDataString) {
+                return JSON.parse(userDataString);
+            }
+        } catch (error) {
+            console.error('Error al obtener datos del usuario:', error);
+        }
+        
+        return {}; 
+    }
+}
+
+/**
+ * Cierra la sesión del usuario y redirige a login.html
  */
 async function logout() {
     try {
@@ -33,8 +64,7 @@ async function logout() {
         // Limpiar datos locales incluso si falla la llamada a la API
         localStorage.removeItem('authToken');
         localStorage.removeItem('userData');
-        const loginPath = (window.PROJECT_ROOT || '') + 'views/pages/login.html';
-        window.location.href = loginPath;
+        window.location.href = 'login.html';
     }
 }
 
