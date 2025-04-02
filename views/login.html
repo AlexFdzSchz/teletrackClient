@@ -10,7 +10,6 @@
     <!-- Eliminamos la etiqueta style ya que usaremos clases de Bootstrap -->
 </head>
 <body class="bg-dark d-flex flex-column h-100">
-    <nav-bar></nav-bar>
     
     <main class="flex-grow-1 d-flex align-items-center py-4">
         <div class="container">
@@ -49,13 +48,12 @@
     
     <script src="../config.js"></script>
     <script src="../public/js/auth.js"></script>
-    <script type="module" src="partials/NavBar.js"></script>
     <script type="module" src="partials/Footer.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Verificar si ya está autenticado
             if (isAuthenticated()) {
-                window.location.href = 'dashboard.html';
+                window.location.href = '../index.html';
                 return;
             }
             
@@ -75,7 +73,7 @@
                     await login(email, password);
                     
                     // Redirigir al dashboard tras éxito
-                    window.location.href = 'dashboard.html';
+                    window.location.href = '../';
                 } catch (error) {
                     // Mostrar mensaje de error
                     errorElement.textContent = error.message || 'Error al iniciar sesión';

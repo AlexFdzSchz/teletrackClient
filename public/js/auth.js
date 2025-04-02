@@ -18,7 +18,7 @@ function checkAuthentication() {
     if (!isAuthenticated()) {
         console.log('Usuario no autenticado, redirigiendo a login.html');
         
-        window.location.href = 'login.html';
+        window.location.href = './views/login.html';
         return null;
     } else {
         const contentElement = document.getElementById('content');
@@ -64,7 +64,7 @@ async function logout() {
         // Limpiar datos locales incluso si falla la llamada a la API
         localStorage.removeItem('authToken');
         localStorage.removeItem('userData');
-        window.location.href = 'login.html';
+        window.location.href = './views/login.html';
     }
 }
 
