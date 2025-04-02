@@ -2,13 +2,11 @@ class NavBar extends HTMLElement {
   connectedCallback() {
     // Verificar si el usuario está autenticado
     const isUserLoggedIn = typeof isAuthenticated === 'function' ? isAuthenticated() : false;
-    
+
     // Obtener información del usuario si está autenticado
-    const userName = isUserLoggedIn && localStorage.getItem('userData') ? 
+    const userName = isUserLoggedIn && localStorage.getItem('userData') ?
       JSON.parse(localStorage.getItem('userData')).nickname || 'Usuario' : '';
-      
-    
-    // Crear el HTML del navbar con rutas relativas
+
     this.innerHTML = `
       <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
         <div class="container-fluid">
