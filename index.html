@@ -10,8 +10,19 @@
     <link href="./public/css/teletrack-theme.css" rel="stylesheet">
     <script src="./config.js"></script>
     <script src="./public/js/auth.js"></script>
+    <script src="./public/js/router.js"></script>
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const userData = checkAuthentication();
+        // Verificar autenticación
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mostrar información sobre la ruta actual para diagnóstico
+            console.log('Ruta actual:', window.location.pathname);
+            console.log('URL completa:', window.location.href);
+            
+            if (!isAuthenticated()) {
+                window.location.href = './views/login.html';
+            }
+        });
     </script>
 </head>
 
@@ -19,10 +30,10 @@
     <nav-bar></nav-bar>
     <main class="flex-grow-1 py-4">
         <div id="content">
-            <div class="container mt-5">
-                <h1 class="text-light">Bienvenido a TeleTrack</h1>
-                <p class="text-light">Estás autenticado correctamente.</p>
-                <button class="btn btn-danger" onclick="logout()">Cerrar sesión</button>
+            <!-- El contenido se cargará dinámicamente -->
+            <div class="container text-center text-light py-5">
+                <div class="spinner-border" role="status"></div>
+                <p class="mt-2">Cargando...</p>
             </div>
         </div>
     </main>
