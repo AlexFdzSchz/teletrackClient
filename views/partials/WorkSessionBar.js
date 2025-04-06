@@ -21,10 +21,15 @@ class WorkSessionBar extends HTMLElement {
             
             <!-- Centro: input + botón, ocupa 8 de 12 columnas en lg -->
             <div class="col-12 col-lg-8 d-flex flex-column align-items-center justify-content-center gap-3">
-              <input type="text"
-                id="sessionDescription"
-                class="form-control bg-dark text-white border-0 px-3 text-center shadow-sm w-100"
-                placeholder="Nombre de sesión">
+              <div class="position-relative w-100">
+                <input type="text"
+                  id="sessionDescription"
+                  class="form-control bg-dark text-white border-0 px-3 text-center shadow-sm w-100"
+                  placeholder="Nombre de sesión">
+                <button id="editDescriptionBtn" class="btn btn-info btn-sm position-absolute end-0 top-0 bottom-0 d-none">
+                  <i class="bi bi-pencil"></i>
+                </button>
+              </div>
               <button id="toggleSessionBtn" class="btn btn-primary btn-sm px-4 py-2 rounded-pill fw-bold d-flex align-items-center justify-content-center gap-2 shadow">
                 <i class="bi bi-play-fill fs-5"></i>
                 <span class="fs-6">Comenzar</span>
@@ -57,9 +62,11 @@ class WorkSessionBar extends HTMLElement {
     this.toggleBtn = document.getElementById('toggleSessionBtn');
     this.startTimeDisplay = document.getElementById('startTime');
     this.elapsedDisplay = document.getElementById('elapsedTime');
+    this.editDescBtn = document.getElementById('editDescriptionBtn');
 
-    // Agregar listener al botón
+    // Agregar listeners a los botones
     this.toggleBtn.addEventListener('click', () => this.toggleSession());
+    this.editDescBtn.addEventListener('click', () => this.editSessionDescription());
     
     // Comprobar si hay una sesión activa al cargar
     this.checkActiveSession();
@@ -273,7 +280,10 @@ class WorkSessionBar extends HTMLElement {
     if (this.activeSession && this.activeSession.description) {
       this.sessionDescInput.value = this.activeSession.description;
     }
-    this.sessionDescInput.disabled = true;
+    
+    // Mostrar botón de confirmar cambios
+    this.editDescBtn.classList.remove('d-none');
+    // El input siempre está habilitado para edición
   }
 
   // Actualiza la UI para mostrar estado inactivo
@@ -286,7 +296,61 @@ class WorkSessionBar extends HTMLElement {
     `;
     this.startTimeDisplay.textContent = '--:--:--';
     this.elapsedDisplay.textContent = '00:00:00';
-    this.sessionDescInput.disabled = false;
+    
+    // Ocultar botón de edición
+    this.editDescBtn.classList.add('d-none');
+  }
+
+  // Editar la descripción
+  async editSessionDescription() {
+    // Solo permitimos editar si hay una sesión activa
+    if (!this.activeSession) return;
+    
+    const newDescription = this.sessionDescInput.value.trim() || 'Sesión sin título';
+    
+    try {
+      const apiBaseUrl = CONFIG.apiBaseUrl;
+      const token = localStorage.getItem('authToken');
+      
+      const response = await fetch(`${apiBaseUrl}/api/worksessions/${this.activeSession.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          description: newDescription
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        console.log('Descripción de sesión actualizada:', data);
+        
+        // Actualizar el objeto de sesión local con la nueva descripción
+        this.activeSession.description = newDescription;
+        
+        // Dar feedback visual de confirmación. Wow! que pro
+        const originalHTML = this.editDescBtn.innerHTML;
+        this.editDescBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
+        this.editDescBtn.classList.add('btn-success');
+        this.editDescBtn.classList.remove('btn-info');
+        
+        // Restaurar el aspecto original después de un momento
+        setTimeout(() => {
+          this.editDescBtn.innerHTML = originalHTML;
+          this.editDescBtn.classList.add('btn-info');
+          this.editDescBtn.classList.remove('btn-success');
+        }, 1000);
+      } else {
+        console.error('Error al actualizar descripción:', data);
+        alert('No se pudo actualizar la descripción de la sesión.');
+      }
+    } catch (error) {
+      console.error('Error al actualizar descripción:', error);
+      alert('Error de conexión al actualizar la descripción.');
+    }
   }
 
   // Formatea una fecha para mostrar la hora
