@@ -1,2 +1,4 @@
 api.md
 node_modules
+# Ignorar mockups temporales
+views/fragments
