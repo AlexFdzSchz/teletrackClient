@@ -138,12 +138,14 @@ input.bg-white:-ms-input-placeholder {
 
 /* El sticky de bootstrap no funciona si lo importo como modulo*/
 nav-bar {
+  display: block; /* Asegura que el componente se renderice como bloque */
   position: sticky;
   top: 0;
   z-index: 1030; 
 }
 
 work-session-bar {
+  display: block; /* Asegura que el componente se renderice como bloque */
   position: sticky;
   bottom: 0;
   z-index: 1020; 
