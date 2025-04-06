@@ -7,11 +7,11 @@ class NavBar extends HTMLElement {
     const userName = isUserLoggedIn && localStorage.getItem('userData') ?
       JSON.parse(localStorage.getItem('userData')).nickname || 'Usuario' : '';
 
-    // Determinar si estamos en login.html
+    // Determinar si estamos en login.html, porque las rutas cambian
     const isInLoginPage = window.location.pathname.includes('login.html');
 
     this.innerHTML = `
-      <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-secondary sticky-top">
         <div class="container-fluid">
           <a class="navbar-brand" href="#" onclick="event.preventDefault(); ${isInLoginPage ? 'window.location.href = \'../index.html\'' : 'navigate(\'./views/fragments/home.html\')'}">TeleTrack</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 

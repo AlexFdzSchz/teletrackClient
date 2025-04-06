@@ -88,3 +88,63 @@ body {
 .text-info { color: var(--bs-info) !important; }
 .text-light { color: var(--bs-light) !important; }
 .text-dark { color: var(--bs-dark) !important; }
+
+/* Estilo para placeholders en inputs porque no hay manera de leerlos */
+::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+  opacity: 1;
+}
+
+::-webkit-input-placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+::-moz-placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+:-ms-input-placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Ajuste para inputs con fondo claro */
+.bg-light input::placeholder,
+.bg-white input::placeholder,
+input.bg-light::placeholder,
+input.bg-white::placeholder {
+  color: rgba(54, 57, 63, 0.6) !important;
+}
+
+.bg-light input::-webkit-input-placeholder,
+.bg-white input::-webkit-input-placeholder,
+input.bg-light::-webkit-input-placeholder,
+input.bg-white::-webkit-input-placeholder {
+  color: rgba(54, 57, 63, 0.6) !important;
+}
+
+.bg-light input::-moz-placeholder,
+.bg-white input::-moz-placeholder,
+input.bg-light::-moz-placeholder,
+input.bg-white::-moz-placeholder {
+  color: rgba(54, 57, 63, 0.6) !important;
+}
+
+.bg-light input:-ms-input-placeholder,
+.bg-white input:-ms-input-placeholder,
+input.bg-light:-ms-input-placeholder,
+input.bg-white:-ms-input-placeholder {
+  color: rgba(54, 57, 63, 0.6) !important;
+}
+
+/* El sticky de bootstrap no funciona si lo importo como modulo*/
+nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1030; 
+}
+
+work-session-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 1020; 
+}

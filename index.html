@@ -14,11 +14,11 @@
     <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Verificar autenticación
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Mostrar información sobre la ruta actual para diagnóstico
             console.log('Ruta actual:', window.location.pathname);
             console.log('URL completa:', window.location.href);
-            
+
             if (!isAuthenticated()) {
                 window.location.href = './views/login.html';
             }
@@ -37,9 +37,13 @@
             </div>
         </div>
     </main>
+
+    <work-session-bar></work-session-bar>
+    
     <site-footer></site-footer>
     <script type="module" src="./views/partials/NavBar.js"></script>
     <script type="module" src="./views/partials/Footer.js"></script>
+    <script type="module" src="./views/partials/WorkSessionBar.js"></script>
 </body>
 
 </html>
