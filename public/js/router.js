@@ -30,12 +30,11 @@ function navigate(route) {
     route = DEFAULT_ROUTE;
   }
   
-  // Cargar contenido
   const contentContainer = document.getElementById('content');
   contentContainer.innerHTML = '<div class="text-center text-light py-3"><div class="spinner-border" role="status"></div></div>';
   
-  // Cargar el contenido
-  fetch(route)
+  // Cargar el contenido y le metemos un timestamp para evitar caché nos la líe
+  fetch(`${route}?t=${new Date().getTime()}`)
     .then(response => response.ok ? response.text() : Promise.reject('Error al cargar contenido'))
     .then(html => {
       // Limpiar el contenedor antes de insertar nuevo contenido
