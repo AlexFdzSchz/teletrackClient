@@ -102,3 +102,36 @@ async function login(email, password) {
         throw error;
     }
 }
+
+/**
+ * Registra un nuevo usuario con la API
+ * @param {string} firstName - Nombre del usuario
+ * @param {string} lastName - Apellido del usuario
+ * @param {string} nickname - Apodo del usuario
+ * @param {string} email - Correo electrónico del usuario
+ * @param {string} password - Contraseña del usuario
+ * @returns {Promise} - Promesa con el resultado del registro
+ */
+async function register(firstName, lastName, nickname, email, password) {
+    try {
+        const apiBaseUrl = CONFIG.apiBaseUrl;
+        const response = await fetch(`${apiBaseUrl}/api/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ firstName, lastName, nickname, email, password })
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || 'Error en el registro');
+        }
+        // Guardar token y datos del usuario tras registro exitoso
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('userData', JSON.stringify(data.user));
+        return data;
+    } catch (error) {
+        console.error('Error en registro:', error);
+        throw error;
+    }
+}

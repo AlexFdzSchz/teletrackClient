@@ -15,7 +15,9 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-6">
-                    <div class="bg-secondary rounded p-4 shadow mx-auto" style="max-width: 400px;">
+
+                    <!-- Container de login -->
+                    <div id="loginContainer" class="bg-secondary rounded p-4 shadow mx-auto" style="max-width: 400px;">
                         <div class="text-center mb-4">
                             <h2 class="text-primary fw-bold">TeleTrack</h2>
                             <p class="text-light">Inicia sesión para continuar</p>
@@ -38,7 +40,52 @@
                                 <button type="submit" class="btn btn-primary btn-lg">Iniciar sesión</button>
                             </div>
                         </form>
+                        <div class="text-center mt-3">
+                            <small><a href="javascript:void(0)" id="showRegister" class="text-light">¿No tienes una cuenta? Regístrate</a></small>
+                        </div>
                     </div>
+
+                    <!-- Container de registro (inicialmente oculto) -->
+                    <div id="registerContainer" class="bg-secondary rounded p-4 shadow mx-auto d-none" style="max-width: 400px;">
+                        <div class="text-center mb-4">
+                            <h2 class="text-primary fw-bold">TeleTrack</h2>
+                            <p class="text-light">Regístrate para continuar</p>
+                        </div>
+                        
+                        <div class="alert alert-danger d-none" id="registerError" role="alert">
+                            Ocurrió un error durante el registro.
+                        </div>
+                        
+                        <form id="registerForm">
+                            <div class="mb-3">
+                                <label for="firstName" class="form-label text-light">Nombre</label>
+                                <input type="text" class="form-control bg-dark text-light border-primary" id="firstName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="lastName" class="form-label text-light">Apellido</label>
+                                <input type="text" class="form-control bg-dark text-light border-primary" id="lastName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="nickname" class="form-label text-light">Apodo</label>
+                                <input type="text" class="form-control bg-dark text-light border-primary" id="nickname" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="registerEmail" class="form-label text-light">Correo electrónico</label>
+                                <input type="email" class="form-control bg-dark text-light border-primary" id="registerEmail" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="registerPassword" class="form-label text-light">Contraseña</label>
+                                <input type="password" class="form-control bg-dark text-light border-primary" id="registerPassword" required>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">Registrarse</button>
+                            </div>
+                        </form>
+                        <div class="text-center mt-3">
+                            <small><a href="javascript:void(0)" id="showLogin" class="text-light">¿Ya tienes una cuenta? Inicia sesión</a></small>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -51,34 +98,58 @@
     <script type="module" src="partials/Footer.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Verificar si ya está autenticado
+            // Si ya está autenticado, redirige.
             if (isAuthenticated()) {
                 window.location.href = '../index.html';
                 return;
             }
             
-            // Manejar envío del formulario
+            // Manejar envío del formulario de login.
             document.getElementById('loginForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
-                
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
                 const errorElement = document.getElementById('loginError');
                 
                 try {
-                    // Ocultar mensaje de error previo
                     errorElement.classList.add('d-none');
-                    
-                    // Intentar login
                     await login(email, password);
-                    
-                    // Redirigir al dashboard tras éxito
                     window.location.href = '../';
                 } catch (error) {
-                    // Mostrar mensaje de error
                     errorElement.textContent = error.message || 'Error al iniciar sesión';
                     errorElement.classList.remove('d-none');
                 }
+            });
+
+            // Manejar envío del formulario de registro.
+            document.getElementById('registerForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const firstName = document.getElementById('firstName').value;
+                const lastName = document.getElementById('lastName').value;
+                const nickname = document.getElementById('nickname').value;
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                const errorElement = document.getElementById('registerError');
+
+                try {
+                    errorElement.classList.add('d-none');
+                    await register(firstName, lastName, nickname, email, password);
+                    window.location.href = '../';
+                } catch (error) {
+                    errorElement.textContent = error.message || 'Error en el registro';
+                    errorElement.classList.remove('d-none');
+                }
+            });
+
+            // Alternar entre formularios.
+            document.getElementById('showRegister').addEventListener('click', function() {
+                document.getElementById('loginContainer').classList.add('d-none');
+                document.getElementById('registerContainer').classList.remove('d-none');
+            });
+
+            document.getElementById('showLogin').addEventListener('click', function() {
+                document.getElementById('registerContainer').classList.add('d-none');
+                document.getElementById('loginContainer').classList.remove('d-none');
             });
         });
     </script>
