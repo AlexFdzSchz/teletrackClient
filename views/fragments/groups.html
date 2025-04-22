@@ -151,8 +151,28 @@
   </div>
 </div>
 
+<!-- Modal de confirmación para salir de un grupo -->
+<div class="modal fade" id="leaveGroupModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content bg-secondary text-light">
+      <div class="modal-header">
+        <h5 class="modal-title">Salir del grupo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="leaveGroupMessage">¿Estás seguro de que quieres salir de este grupo?</p>
+        <input type="hidden" id="leaveGroupId">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-warning" id="confirmLeaveBtn">Salir del grupo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-// Declarar funciones en el ámbito global para que sean accesibles desde los botones HTML
+// Declarar funciones en el ámbito global para que sean accesibles desde los botones HTML si no no funca
 window.showDeleteModal = function(groupId) {
   // Buscar el grupo en nuestra lista de grupos cargados
   const group = myGroups.find(g => g.id === groupId);
@@ -201,6 +221,23 @@ window.navigateToGroup = function(groupId) {
 window.respondToInvitation = function(invitationId, response) {
   // llamar a la versión interna de la función 
   _respondToInvitation(invitationId, response);
+};
+
+window.showLeaveModal = function(groupId) {
+  // Buscar el grupo en nuestra lista de grupos cargados
+  const group = myGroups.find(g => g.id === groupId);
+  if (!group) return;
+  
+  // Guardar el ID del grupo del que se quiere salir
+  document.getElementById('leaveGroupId').value = groupId;
+  
+  // Personalizar el mensaje con el nombre del grupo
+  const messageElement = document.getElementById('leaveGroupMessage');
+  messageElement.innerHTML = `¿Estás seguro de que quieres salir del grupo <strong>"${group.name}"</strong>? Ya no podrás ver el contenido compartido en este grupo.`;
+  
+  // Mostrar el modal de confirmación
+  const modal = new bootstrap.Modal(document.getElementById('leaveGroupModal'));
+  modal.show();
 };
 
 // Resto de las variables y funciones (hacer privadas las que ya están expuestas en window)
@@ -346,7 +383,11 @@ function displayGroups(groups) {
                 <button class="btn btn-sm btn-danger" onclick="showDeleteModal(${group.id})">
                   <i class="bi bi-trash"></i>
                 </button>
-              ` : ''}
+              ` : `
+                <button class="btn btn-sm btn-warning" onclick="showLeaveModal(${group.id})">
+                  <i class="bi bi-box-arrow-left"></i>
+                </button>
+              `}
             </div>
           </div>
         </div>
@@ -416,6 +457,9 @@ function setupEventListeners() {
   
   // Listener para enviar invitación
   document.getElementById('sendInviteBtn').addEventListener('click', sendInvitation);
+  
+  // Listener para confirmar salir del grupo
+  document.getElementById('confirmLeaveBtn').addEventListener('click', leaveGroup);
 }
 
 // Crear un nuevo grupo
@@ -579,6 +623,40 @@ async function sendInvitation() {
   } catch (error) {
     console.error('Error al enviar invitación:', error);
     showErrorAlert(error.message || 'Error al enviar invitación');
+  }
+}
+
+// Función para salir de un grupo
+async function leaveGroup() {
+  try {
+    const groupId = document.getElementById('leaveGroupId').value;
+    
+    const apiBaseUrl = CONFIG.apiBaseUrl;
+    const token = localStorage.getItem('authToken');
+    
+    const response = await fetch(`${apiBaseUrl}/api/groups/${groupId}/leave`, {
+      mode: 'cors',
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al salir del grupo');
+    }
+    
+    // Cerrar modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('leaveGroupModal'));
+    modal.hide();
+    
+    // Mostrar mensaje de éxito y recargar grupos
+    showSuccessAlert('Has salido del grupo correctamente');
+    await loadGroups();
+  } catch (error) {
+    console.error('Error al salir del grupo:', error);
+    showErrorAlert(error.message || 'Error al salir del grupo');
   }
 }
 
