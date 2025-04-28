@@ -34,6 +34,7 @@ function navigate(route) {
   contentContainer.innerHTML = '<div class="text-center text-light py-3"><div class="spinner-border" role="status"></div></div>';
   
   // Cargar el contenido y le metemos un timestamp para evitar caché nos la líe
+  // No usamos handleApiRequest aquí porque estamos haciendo fetch a un archivo HTML local, no a la API
   fetch(`${route}?t=${new Date().getTime()}`)
     .then(response => response.ok ? response.text() : Promise.reject('Error al cargar contenido'))
     .then(html => {

@@ -1,6 +1,6 @@
 <div class="container mt-4">
   <!-- Contenedor de alertas para notificaciones -->
-  <div class="position-fixed top-0 start-0 end-0 p-3" style="z-index: 1050;" id="alertContainer">
+  <div class="p-3" style="z-index: 1050;" id="alertContainer">
     <!-- Las alertas se insertarán aquí dinámicamente -->
   </div>
   
@@ -269,7 +269,7 @@ async function loadGroups() {
     const apiBaseUrl = CONFIG.apiBaseUrl;
     const token = localStorage.getItem('authToken');
     
-    const response = await fetch(`${apiBaseUrl}/api/groups`, {
+    const response = await handleApiRequest(`${apiBaseUrl}/api/groups`, {
       mode: 'cors',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -301,7 +301,7 @@ async function loadInvitations() {
     const apiBaseUrl = CONFIG.apiBaseUrl;
     const token = localStorage.getItem('authToken');
     
-    const response = await fetch(`${apiBaseUrl}/api/groups/invitations`, {
+    const response = await handleApiRequest(`${apiBaseUrl}/api/groups/invitations`, {
       mode: 'cors',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -499,7 +499,7 @@ async function createGroup() {
     const apiBaseUrl = CONFIG.apiBaseUrl;
     const token = localStorage.getItem('authToken');
     
-    const response = await fetch(`${apiBaseUrl}/api/groups`, {
+    const response = await handleApiRequest(`${apiBaseUrl}/api/groups`, {
       mode: 'cors',
       method: 'POST',
       headers: {
@@ -546,7 +546,7 @@ async function updateGroup() {
     const apiBaseUrl = CONFIG.apiBaseUrl;
     const token = localStorage.getItem('authToken');
     
-    const response = await fetch(`${apiBaseUrl}/api/groups/${groupId}`, {
+    const response = await handleApiRequest(`${apiBaseUrl}/api/groups/${groupId}`, {
       mode: 'cors',
       method: 'PUT',
       headers: {
@@ -582,7 +582,7 @@ async function deleteGroup() {
     const apiBaseUrl = CONFIG.apiBaseUrl;
     const token = localStorage.getItem('authToken');
     
-    const response = await fetch(`${apiBaseUrl}/api/groups/${groupId}`, {
+    const response = await handleApiRequest(`${apiBaseUrl}/api/groups/${groupId}`, {
       mode: 'cors',
       method: 'DELETE',
       headers: {
@@ -622,7 +622,7 @@ async function sendInvitation() {
     const apiBaseUrl = CONFIG.apiBaseUrl;
     const token = localStorage.getItem('authToken');
     
-    const response = await fetch(`${apiBaseUrl}/api/groups/invite`, {
+    const response = await handleApiRequest(`${apiBaseUrl}/api/groups/invite`, {
       mode: 'cors',
       method: 'POST',
       headers: {
@@ -657,7 +657,7 @@ async function leaveGroup() {
     const apiBaseUrl = CONFIG.apiBaseUrl;
     const token = localStorage.getItem('authToken');
     
-    const response = await fetch(`${apiBaseUrl}/api/groups/${groupId}/leave`, {
+    const response = await handleApiRequest(`${apiBaseUrl}/api/groups/${groupId}/leave`, {
       mode: 'cors',
       method: 'POST',
       headers: {
@@ -697,13 +697,12 @@ async function _respondToInvitation(invitationId, response, groupId) {
       url = `${apiBaseUrl}/api/groups/${groupId}/accept`;
       method = 'POST';
     } else {
-      // Para rechazar usamos una ruta para rechazar (que deberá implementarse en el servidor)
-      // Como no está documentada explícitamente, podríamos usar una ruta similar
+      // EN CONSTRUCCION, ESTO NO FUNCIONA AUN, SOY VAGO
       url = `${apiBaseUrl}/api/groups/${groupId}/reject`;
       method = 'POST';
     }
     
-    const apiResponse = await fetch(url, {
+    const apiResponse = await handleApiRequest(url, {
       mode: 'cors',
       method: method,
       headers: {

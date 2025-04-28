@@ -80,7 +80,7 @@ class WorkSessionBar extends HTMLElement {
       
       console.log('Verificando sesiones existentes en el servidor...');
       
-      const response = await fetch(`${apiBaseUrl}/api/worksessions/latest`, {
+      const response = await handleApiRequest(`${apiBaseUrl}/api/worksessions/latest`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -157,7 +157,7 @@ class WorkSessionBar extends HTMLElement {
       const apiBaseUrl = CONFIG.apiBaseUrl;
       const token = localStorage.getItem('authToken');
       
-      const response = await fetch(`${apiBaseUrl}/api/worksessions`, {
+      const response = await handleApiRequest(`${apiBaseUrl}/api/worksessions`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -208,7 +208,7 @@ class WorkSessionBar extends HTMLElement {
       const token = localStorage.getItem('authToken');
       const endTime = new Date();
       
-      const response = await fetch(`${apiBaseUrl}/api/worksessions/${this.activeSession.id}`, {
+      const response = await handleApiRequest(`${apiBaseUrl}/api/worksessions/${this.activeSession.id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -312,7 +312,7 @@ class WorkSessionBar extends HTMLElement {
       const apiBaseUrl = CONFIG.apiBaseUrl;
       const token = localStorage.getItem('authToken');
       
-      const response = await fetch(`${apiBaseUrl}/api/worksessions/${this.activeSession.id}`, {
+      const response = await handleApiRequest(`${apiBaseUrl}/api/worksessions/${this.activeSession.id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

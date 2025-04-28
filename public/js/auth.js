@@ -2,41 +2,92 @@
 
 /**
  * Verifica si el usuario está autenticado
- * @returns {boolean} - true si el usuario tiene un token válido, false en caso contrario
+ * @param {boolean} checkWithServer - Si es true, verifica también con el servidor si el token es válido
+ * @returns {boolean|Promise<boolean>} - true si el usuario tiene un token válido, false en caso contrario
  */
-function isAuthenticated() {
+function isAuthenticated(checkWithServer = false) {
     const token = localStorage.getItem('authToken');
-    return !!token; 
+    
+    // Si no hay token, no está autenticado
+    if (!token) return checkWithServer ? Promise.resolve(false) : false;
+    
+    // Modo de compatibilidad: solo verificar existencia del token
+    if (!checkWithServer) return true;
+    
+    // Modo de verificación completa: comprobar validez del token con el servidor
+    return new Promise(async (resolve) => {
+        try {
+            const apiBaseUrl = CONFIG.apiBaseUrl;
+            const response = await fetch(`${apiBaseUrl}/api/auth/me`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            // Si el servidor devuelve 401, el token no es válido o ha caducado
+            if (response.status === 401) {
+                // Limpiar datos de autenticación si el token ha caducado
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userData');
+                resolve(false);
+                return;
+            }
+            
+            // Si la respuesta es exitosa, el token es válido
+            if (response.ok) {
+                resolve(true);
+                return;
+            }
+            
+            // Para cualquier otro error, consideramos que no está autenticado
+            resolve(false);
+        } catch (error) {
+            console.error('Error al verificar autenticación con el servidor:', error);
+            // En caso de error de red, consideramos que podría estar autenticado si tiene token
+            resolve(true);
+        }
+    });
 }
 
 /**
  * Verifica si el usuario está autenticado y muestra el contenido apropiadamente.
  * Si el usuario no está autenticado, redirige a login.html.
- * @returns {Object|null} - Datos del usuario si está autenticado, null en caso contrario
+ * @param {boolean} checkWithServer - Si es true, verifica también con el servidor
+ * @returns {Promise<Object|null>} - Promesa con datos del usuario si está autenticado, null en caso contrario
  */
-function checkAuthentication() {
-    if (!isAuthenticated()) {
-        console.log('Usuario no autenticado, redirigiendo a login.html');
+async function checkAuthentication(checkWithServer = true) {
+    try {
+        const authenticated = checkWithServer 
+            ? await isAuthenticated(true) 
+            : isAuthenticated();
         
+        if (!authenticated) {
+            console.log('Usuario no autenticado, redirigiendo a login.html');
+            window.location.href = './views/login.html';
+            return null;
+        } else {
+            const contentElement = document.getElementById('content');
+            if (contentElement) {
+                contentElement.classList.remove('d-none');
+            }
+            
+            // Obtener y devolver los datos del usuario
+            try {
+                const userDataString = localStorage.getItem('userData');
+                if (userDataString) {
+                    return JSON.parse(userDataString);
+                }
+            } catch (error) {
+                console.error('Error al obtener datos del usuario:', error);
+            }
+            
+            return {}; 
+        }
+    } catch (error) {
+        console.error('Error en la verificación de autenticación:', error);
         window.location.href = './views/login.html';
         return null;
-    } else {
-        const contentElement = document.getElementById('content');
-        if (contentElement) {
-            contentElement.classList.remove('d-none');
-        }
-        
-        // Obtener y devolver los datos del usuario
-        try {
-            const userDataString = localStorage.getItem('userData');
-            if (userDataString) {
-                return JSON.parse(userDataString);
-            }
-        } catch (error) {
-            console.error('Error al obtener datos del usuario:', error);
-        }
-        
-        return {}; 
     }
 }
 
@@ -50,6 +101,7 @@ async function logout() {
         if (token) {
             // Llamar a la API para registrar el logout 
             const apiBaseUrl = CONFIG.apiBaseUrl;
+            // No usar handleApiRequest aquí para evitar recursión infinita
             await fetch(`${apiBaseUrl}/api/auth/logout`, {
                 method: 'POST',
                 headers: {
@@ -69,6 +121,32 @@ async function logout() {
 }
 
 /**
+ * Utilidad para manejar peticiones a la API que verifica automáticamente
+ * si la respuesta es 401 (Unauthorized) y cierra sesión en ese caso.
+ * 
+ * @param {string} url - URL de la petición
+ * @param {Object} options - Opciones de fetch
+ * @returns {Promise<Response>} - Promesa con la respuesta
+ */
+async function handleApiRequest(url, options = {}) {
+    try {
+        const response = await fetch(url, options);
+        
+        // Si la respuesta es 401 Unauthorized, el token ha expirado
+        if (response.status === 401) {
+            console.warn('Sesión expirada o token inválido. Cerrando sesión...');
+            await logout();
+            return response; // Devolvemos la respuesta original para manejo adicional si es necesario
+        }
+        
+        return response;
+    } catch (error) {
+        console.error('Error en petición a la API:', error);
+        throw error;
+    }
+}
+
+/**
  * Inicia sesión con la API
  * @param {string} email - Correo electrónico del usuario
  * @param {string} password - Contraseña del usuario
@@ -78,6 +156,7 @@ async function login(email, password) {
     try {
         // Acceder a CONFIG que está disponible globalmente
         const apiBaseUrl = CONFIG.apiBaseUrl;
+        // No usar handleApiRequest para login ya que no tenemos token aún
         const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
             method: 'POST',
             headers: {
@@ -115,6 +194,7 @@ async function login(email, password) {
 async function register(firstName, lastName, nickname, email, password) {
     try {
         const apiBaseUrl = CONFIG.apiBaseUrl;
+        // No usar handleApiRequest para registro ya que no tenemos token aún
         const response = await fetch(`${apiBaseUrl}/api/auth/register`, {
             method: 'POST',
             headers: {
