@@ -6,7 +6,7 @@
   
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="text-light">Grupos</h1>
-    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newGroupModal">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newGroupModal">
       <i class="bi bi-plus-circle me-2"></i>Nuevo grupo
     </button>
   </div>
@@ -351,12 +351,12 @@ function displayGroups(groups) {
     // Determinar si el usuario actual es el creador del grupo
     const isCreator = group.creatorId === currentUserId;
     const memberCount = group.Users ? group.Users.length : 0;
-    const color = isCreator ? 'danger' : 'primary';
+    const color = isCreator ? 'success' : 'primary';
     
     html += `
       <div class="col-md-6 col-lg-4 mb-4">
         <div class="card bg-secondary h-100">
-          <div class="card-header bg-${color} bg-opacity-25 d-flex justify-content-between align-items-center">
+          <div class="card-header bg-${color} bg-opacity-50 d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0 text-light">${group.name}</h5>
             ${isCreator ? '<span class="badge bg-primary">Creador</span>' : ''}
           </div>
@@ -368,17 +368,17 @@ function displayGroups(groups) {
             </div>
             <div class="d-flex justify-content-end">
               ${isCreator ? `
-                <button class="btn btn-sm btn-warning me-1" onclick="showInviteModal(${group.id})">
+                <button class="btn btn-sm btn-primary me-1" onclick="showInviteModal(${group.id})">
                   <i class="bi bi-person-plus"></i>
                 </button>
-                <button class="btn btn-sm btn-success me-1" onclick="showEditModal(${group.id})">
+                <button class="btn btn-sm btn-primary me-1" onclick="showEditModal(${group.id})">
                   <i class="bi bi-pencil"></i>
                 </button>
                 <button class="btn btn-sm btn-danger" onclick="showDeleteModal(${group.id})">
                   <i class="bi bi-trash"></i>
                 </button>
               ` : `
-                <button class="btn btn-sm btn-warning" onclick="showLeaveModal(${group.id})">
+                <button class="btn btn-sm btn-danger" onclick="showLeaveModal(${group.id})">
                   <i class="bi bi-box-arrow-left"></i>
                 </button>
               `}
@@ -697,7 +697,6 @@ async function _respondToInvitation(invitationId, response, groupId) {
       url = `${apiBaseUrl}/api/groups/${groupId}/accept`;
       method = 'POST';
     } else {
-      // EN CONSTRUCCION, ESTO NO FUNCIONA AUN, SOY VAGO
       url = `${apiBaseUrl}/api/groups/${groupId}/reject`;
       method = 'POST';
     }

@@ -9,8 +9,8 @@
   --bs-secondary: #4F545C;     
   --bs-secondary-rgb: 79, 84, 92;
   
-  --bs-success: #57F287;       
-  --bs-success-rgb: 87, 242, 135;
+  --bs-success: #28a745;       /* Color modificado para mejor contraste */
+  --bs-success-rgb: 40, 167, 69; /* Valor RGB actualizado */
   
   --bs-danger: #ED4245;        
   --bs-danger-rgb: 237, 66, 69;
