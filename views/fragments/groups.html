@@ -14,12 +14,12 @@
   <!-- Tabs para grupos e invitaciones -->
   <ul class="nav nav-tabs mb-4" id="groupTabs" role="tablist">
     <li class="nav-item" role="presentation">
-      <button class="nav-link active text-light" id="groups-tab" data-bs-toggle="tab" data-bs-target="#groups-tab-pane" type="button" role="tab">
+      <button class="nav-link active" id="groups-tab" data-bs-toggle="tab" data-bs-target="#groups-tab-pane" type="button" role="tab">
         <i class="bi bi-people me-2"></i>Mis Grupos
       </button>
     </li>
     <li class="nav-item" role="presentation">
-      <button class="nav-link text-light" id="invitations-tab" data-bs-toggle="tab" data-bs-target="#invitations-tab-pane" type="button" role="tab">
+      <button class="nav-link" id="invitations-tab" data-bs-toggle="tab" data-bs-target="#invitations-tab-pane" type="button" role="tab">
         <i class="bi bi-envelope me-2"></i>Invitaciones
         <span class="badge bg-primary rounded-pill" id="invitationCount">0</span>
       </button>
@@ -118,8 +118,8 @@
         <form id="inviteUserForm">
           <input type="hidden" id="inviteGroupId">
           <div class="mb-3">
-            <label for="userEmail" class="form-label">Email del usuario</label>
-            <input type="email" class="form-control bg-dark text-light border-primary" id="userEmail" required>
+            <label for="userNickname" class="form-label">Nickname del usuario</label>
+            <input type="text" class="form-control bg-dark text-light border-primary" id="userNickname" required placeholder="Introduce el nickname del usuario">
           </div>
         </form>
       </div>
@@ -204,7 +204,7 @@ window.showEditModal = function(groupId) {
 
 window.showInviteModal = function(groupId) {
   document.getElementById('inviteGroupId').value = groupId;
-  document.getElementById('userEmail').value = '';
+  document.getElementById('userNickname').value = '';
   
   const modal = new bootstrap.Modal(document.getElementById('inviteUserModal'));
   modal.show();
@@ -218,9 +218,9 @@ window.navigateToGroup = function(groupId) {
   alert(`Navegación al grupo ${groupId} (funcionalidad aún no implementada)`);
 };
 
-window.respondToInvitation = function(invitationId, response) {
+window.respondToInvitation = function(invitationId, response, groupId) {
   // llamar a la versión interna de la función 
-  _respondToInvitation(invitationId, response);
+  _respondToInvitation(invitationId, response, groupId);
 };
 
 window.showLeaveModal = function(groupId) {
@@ -367,12 +367,6 @@ function displayGroups(groups) {
               <span>${memberCount} ${memberCount === 1 ? 'miembro' : 'miembros'}</span>
             </div>
             <div class="d-flex justify-content-end">
-              <button class="btn btn-sm btn-info me-1" onclick="navigateToGroup(${group.id})">
-                <i class="bi bi-box-arrow-in-right"></i>
-              </button>
-              <button class="btn btn-sm btn-primary me-1" onclick="showMembersModal(${group.id})">
-                <i class="bi bi-people"></i>
-              </button>
               ${isCreator ? `
                 <button class="btn btn-sm btn-warning me-1" onclick="showInviteModal(${group.id})">
                   <i class="bi bi-person-plus"></i>
@@ -416,23 +410,52 @@ function displayInvitations(invitations) {
   let html = '';
   
   invitations.forEach(invitation => {
+    // Obtener información del grupo - CORREGIDO: usar "group" en minúscula
+    const group = invitation.group || {};
+    const groupId = group.id; // Extraer correctamente el ID del grupo
+    const groupName = group.name || 'Grupo sin nombre';
+    const groupDesc = group.description || 'Sin descripción';
+    
+    // Obtener información del invitador - CORREGIDO: usar "inviter" en minúscula
+    const inviter = invitation.inviter || {};
+    // Formatear el nombre del invitador con nombre completo (si ambos existen) o nickname
+    let inviterName = inviter.nickname || 'Usuario desconocido';
+    if (inviter.firstName && inviter.lastName) {
+      inviterName = `${inviter.firstName} ${inviter.lastName} (${inviter.nickname})`;
+    }
+    
     html += `
       <div class="col-md-6 mb-4">
-        <div class="card bg-secondary">
-          <div class="card-header">
-            <h5 class="card-title mb-0 text-light">Invitación: ${invitation.Group.name}</h5>
+        <div class="card bg-secondary h-100">
+          <div class="card-header bg-info bg-opacity-25 d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 text-light">
+              <i class="bi bi-envelope-fill me-2"></i>
+              ${groupName}
+            </h5>
+            <span class="badge bg-info">Invitación</span>
           </div>
-          <div class="card-body">
-            <p class="card-text text-light">${invitation.Group.description || 'Sin descripción'}</p>
-            <p class="text-light">
-              <small>Invitado por: ${invitation.Inviter.nickname}</small>
-            </p>
+          <div class="card-body d-flex flex-column">
+            <p class="card-text text-light flex-grow-1">${groupDesc}</p>
+            
+            <div class="d-flex flex-column text-light mb-3">
+              <div class="mb-1">
+                <i class="bi bi-person-fill me-2"></i>
+                <span>Invitado por: <strong>${inviterName}</strong></span>
+              </div>
+              ${invitation.createdAt ? `
+              <div>
+                <i class="bi bi-calendar-event me-2"></i>
+                <span>Recibida: ${new Date(invitation.createdAt).toLocaleDateString('es')}</span>
+              </div>
+              ` : ''}
+            </div>
+            
             <div class="d-flex justify-content-end">
-              <button class="btn btn-success me-2" onclick="respondToInvitation(${invitation.id}, 'accept')">
-                Aceptar
+              <button class="btn btn-success me-2" onclick="respondToInvitation(${invitation.userGroupId}, 'accept', ${groupId})">
+                <i class="bi bi-check-circle me-1"></i>Aceptar
               </button>
-              <button class="btn btn-danger" onclick="respondToInvitation(${invitation.id}, 'reject')">
-                Rechazar
+              <button class="btn btn-danger" onclick="respondToInvitation(${invitation.userGroupId}, 'reject', ${groupId})">
+                <i class="bi bi-x-circle me-1"></i>Rechazar
               </button>
             </div>
           </div>
@@ -589,10 +612,10 @@ async function deleteGroup() {
 async function sendInvitation() {
   try {
     const groupId = document.getElementById('inviteGroupId').value;
-    const email = document.getElementById('userEmail').value.trim();
+    const targetNickname = document.getElementById('userNickname').value.trim();
     
-    if (!email) {
-      showErrorAlert('El email del usuario es obligatorio');
+    if (!targetNickname) {
+      showErrorAlert('El nickname del usuario es obligatorio');
       return;
     }
     
@@ -606,7 +629,7 @@ async function sendInvitation() {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ groupId, email })
+      body: JSON.stringify({ groupId, targetNickname })
     });
     
     if (!response.ok) {
@@ -661,16 +684,31 @@ async function leaveGroup() {
 }
 
 // Versión interna de respondToInvitation que será llamada desde la versión global
-async function _respondToInvitation(invitationId, response) {
+async function _respondToInvitation(invitationId, response, groupId) {
   try {
     const apiBaseUrl = CONFIG.apiBaseUrl;
     const token = localStorage.getItem('authToken');
     
-    const apiResponse = await fetch(`${apiBaseUrl}/api/groups/invitations/${invitationId}/${response}`, {
+    let url, method;
+    
+    // Usar la ruta correcta según la documentación de la API
+    if (response === 'accept') {
+      // Para aceptar, usamos el endpoint documentado con el ID del grupo
+      url = `${apiBaseUrl}/api/groups/${groupId}/accept`;
+      method = 'POST';
+    } else {
+      // Para rechazar usamos una ruta para rechazar (que deberá implementarse en el servidor)
+      // Como no está documentada explícitamente, podríamos usar una ruta similar
+      url = `${apiBaseUrl}/api/groups/${groupId}/reject`;
+      method = 'POST';
+    }
+    
+    const apiResponse = await fetch(url, {
       mode: 'cors',
-      method: 'POST',
+      method: method,
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
     });
     
