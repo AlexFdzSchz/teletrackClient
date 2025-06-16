@@ -10,15 +10,10 @@
     <link href="./public/css/teletrack-theme.css" rel="stylesheet">
     <script src="./config.js"></script>
     <script src="./public/js/auth.js"></script>
-    <script src="./public/js/router.js"></script>
     <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Verificar autenticación
         document.addEventListener('DOMContentLoaded', function () {
-            // Mostrar información sobre la ruta actual para diagnóstico
-            console.log('Ruta actual:', window.location.pathname);
-            console.log('URL completa:', window.location.href);
-
             if (!isAuthenticated()) {
                 window.location.href = './views/login.html';
             }
@@ -29,11 +24,70 @@
 <body class="bg-dark d-flex flex-column h-100">
     <nav-bar></nav-bar>
     <main class="flex-grow-1 py-4">
-        <div id="content">
-            <!-- El contenido se cargará dinámicamente -->
-            <div class="container text-center text-light py-5">
-                <div class="spinner-border" role="status"></div>
-                <p class="mt-2">Cargando...</p>
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1 class="text-light">Bienvenido a TeleTrack</h1>
+                    <p class="text-light">Esto es un mockup, nada de esto funciona :D</p>
+                    
+                    <div class="card bg-secondary text-light mt-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Estadísticas</h5>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="p-3 bg-dark rounded text-center">
+                                        <i class="bi bi-camera-video-fill fs-1 text-primary"></i>
+                                        <h3 class="mt-2" id="sessionCount">--</h3>
+                                        <p>Sesiones totales</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="p-3 bg-dark rounded text-center">
+                                        <i class="bi bi-people-fill fs-1 text-success"></i>
+                                        <h3 class="mt-2" id="groupCount">--</h3>
+                                        <p>Grupos activos</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="p-3 bg-dark rounded text-center">
+                                        <i class="bi bi-calendar-week fs-1 text-warning"></i>
+                                        <h3 class="mt-2" id="upcomingCount">--</h3>
+                                        <p>Próximas sesiones</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card bg-secondary text-light mt-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Acciones rápidas</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <a href="./views/sessions.html" class="btn btn-primary w-100">
+                                        <i class="bi bi-camera-video-fill me-2"></i>Gestionar Sesiones
+                                    </a>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <a href="./views/groups.html" class="btn btn-success w-100">
+                                        <i class="bi bi-people-fill me-2"></i>Ver Grupos
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card bg-secondary text-light">
+                        <div class="card-body">
+                            <h5 class="card-title">Actividad reciente</h5>
+                            <div id="recentActivity">
+                                <p class="text-muted">Cargando actividad...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -44,6 +98,7 @@
     <script type="module" src="./views/partials/NavBar.js"></script>
     <script type="module" src="./views/partials/Footer.js"></script>
     <script type="module" src="./views/partials/WorkSessionBar.js"></script>
+    
 </body>
 
 </html>

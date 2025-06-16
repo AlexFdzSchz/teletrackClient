@@ -116,7 +116,11 @@ async function logout() {
         // Limpiar datos locales incluso si falla la llamada a la API
         localStorage.removeItem('authToken');
         localStorage.removeItem('userData');
-        window.location.href = './views/login.html';
+        
+        // Determinar la ruta correcta según dónde estemos
+        const isInViewsFolder = window.location.pathname.includes('/views/');
+        const loginUrl = isInViewsFolder ? './login.html' : './views/login.html';
+        window.location.href = loginUrl;
     }
 }
 

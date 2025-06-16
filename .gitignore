@@ -1,6 +1,8 @@
 api.md
 node_modules
 # Ignorar mockups temporales
-views/fragments/options.html
-views/fragments/home.html
-views/fragments/sessions.html
+views/options.html
+views/home.html
+views/sessions.html
+views/chat.html
+README.md

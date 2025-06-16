@@ -7,13 +7,15 @@ class NavBar extends HTMLElement {
     const userName = isUserLoggedIn && localStorage.getItem('userData') ?
       JSON.parse(localStorage.getItem('userData')).nickname || 'Usuario' : '';
 
-    // Determinar si estamos en login.html, porque las rutas cambian
-    const isInLoginPage = window.location.pathname.includes('login.html');
+    // Determinar si estamos en una página de views/ o en la raíz
+    const isInViewsFolder = window.location.pathname.includes('/views/');
+    const homeUrl = isInViewsFolder ? '../index.html' : './index.html';
+    const viewsPrefix = isInViewsFolder ? './' : './views/';
 
     this.innerHTML = `
       <nav class="navbar navbar-expand-lg navbar-dark bg-secondary sticky-top">
         <div class="container-fluid">
-          <a class="navbar-brand" href="#" onclick="event.preventDefault(); ${isInLoginPage ? 'window.location.href = \'../index.html\'' : 'navigate(\'./views/fragments/home.html\')'}">TeleTrack</a>
+          <a class="navbar-brand" href="${homeUrl}">TeleTrack</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
                   data-bs-target="#navbarMain" aria-controls="navbarMain" 
                   aria-expanded="false" aria-label="Alternar navegación">
@@ -23,16 +25,19 @@ class NavBar extends HTMLElement {
           <div class="collapse navbar-collapse" id="navbarMain">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-                <a class="nav-link" href="#" data-route="home" onclick="event.preventDefault(); navigate('./views/fragments/home.html')">Inicio</a>
+                <a class="nav-link" href="${homeUrl}">Inicio</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#" data-route="sessions" onclick="event.preventDefault(); navigate('./views/fragments/sessions.html')">Sesiones</a>
+                <a class="nav-link" href="${viewsPrefix}sessions.html">Sesiones</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#" data-route="groups" onclick="event.preventDefault(); navigate('./views/fragments/groups.html')">Grupos</a>
+                <a class="nav-link" href="${viewsPrefix}groups.html">Grupos</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#" data-route="options" onclick="event.preventDefault(); navigate('./views/fragments/options.html')">Opciones</a>
+                <a class="nav-link" href="${viewsPrefix}chat.html">Chat</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="${viewsPrefix}options.html">Opciones</a>
               </li>
             </ul>
             
@@ -44,7 +49,7 @@ class NavBar extends HTMLElement {
                 </div>
                 <button class="btn btn-danger" onclick="logout()">Cerrar sesión</button>
               ` : `
-                <a href="${isInLoginPage ? '#' : './views/login.html'}" class="btn btn-primary">Iniciar sesión</a>
+                <a href="${isInViewsFolder ? './login.html' : './views/login.html'}" class="btn btn-primary">Iniciar sesión</a>
               `}
             </div>
           </div>
