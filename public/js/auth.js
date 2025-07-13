@@ -140,7 +140,7 @@ async function handleApiRequest(url, options = {}) {
         if (response.status === 401) {
             console.warn('Sesión expirada o token inválido. Cerrando sesión...');
             await logout();
-            return response; // Devolvemos la respuesta original para manejo adicional si es necesario
+            return response; 
         }
         
         return response;

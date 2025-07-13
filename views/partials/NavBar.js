@@ -34,9 +34,6 @@ class NavBar extends HTMLElement {
                 <a class="nav-link" href="${viewsPrefix}groups.html">Grupos</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="${viewsPrefix}chat.html">Chat</a>
-              </li>
-              <li class="nav-item">
                 <a class="nav-link" href="${viewsPrefix}options.html">Opciones</a>
               </li>
             </ul>
