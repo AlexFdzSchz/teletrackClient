@@ -4,5 +4,4 @@ node_modules
 views/options.html
 views/home.html
 views/sessions.html
-views/chat.html
 README.md
