@@ -31,12 +31,6 @@
                     <div class="card bg-secondary text-light flex-grow-1">
                         <div class="card-header">
                             <h5 class="mb-0">Conversaciones</h5>
-                            <div class="input-group mt-2">
-                                <input type="text" class="form-control bg-dark text-light border-0" placeholder="Buscar chats...">
-                                <button class="btn btn-outline-primary" type="button">
-                                    <i class="bi bi-search"></i>
-                                </button>
-                            </div>
                         </div>
                         <div class="card-body p-0 overflow-auto flex-grow-1">
                             <div class="list-group list-group-flush" id="chatList">
@@ -64,17 +58,6 @@
                                     <small class="text-muted" id="activeChatStatus">Para comenzar a chatear</small>
                                 </div>
                             </div>
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-outline-light btn-sm">
-                                    <i class="bi bi-camera-video"></i>
-                                </button>
-                                <button class="btn btn-outline-light btn-sm">
-                                    <i class="bi bi-telephone"></i>
-                                </button>
-                                <button class="btn btn-outline-light btn-sm">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                            </div>
                         </div>
 
                         <!-- Área de mensajes -->
@@ -91,7 +74,10 @@
                                 <button class="btn btn-outline-primary" type="button">
                                     <i class="bi bi-paperclip"></i>
                                 </button>
-                                <input type="text" class="form-control bg-dark text-light border-0" placeholder="Escribe un mensaje..." id="messageInput">
+                                <div class="position-relative flex-grow-1">
+                                    <input type="text" class="form-control bg-dark text-light border-0" placeholder="Escribe un mensaje..." id="messageInput" maxlength="500">
+                                    <small id="charCount" class="position-absolute text-muted" style="bottom: -20px; right: 5px;">0/500</small>
+                                </div>
                                 <button class="btn btn-primary" type="button" onclick="sendMessage()">
                                     <i class="bi bi-send"></i>
                                 </button>
@@ -142,6 +128,23 @@
                 messageInput.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
                         sendMessage();
+                    }
+                });
+                
+                // Actualizar contador de caracteres
+                messageInput.addEventListener('input', function() {
+                    const maxLength = parseInt(this.getAttribute('maxlength'));
+                    const currentLength = this.value.length;
+                    const charCount = document.getElementById('charCount');
+                    charCount.textContent = `${currentLength}/${maxLength}`;
+                    
+                    // Cambiar color cuando se acerca al límite
+                    if (currentLength > maxLength * 0.8) {
+                        charCount.classList.remove('text-muted');
+                        charCount.classList.add('text-warning');
+                    } else {
+                        charCount.classList.remove('text-warning');
+                        charCount.classList.add('text-muted');
                     }
                 });
             }
@@ -369,7 +372,7 @@
                 
                 html += `
                     <div class="d-flex ${alignClass} mb-3">
-                        <div class="card ${cardClass}" style="max-width: 70%;">
+                        <div class="card message-card ${cardClass}">
                             <div class="card-body py-2 px-3">
                                 ${!isOwnMessage ? `<small class="text-info fw-bold">${authorName}</small>` : ''}
                                 <p class="mb-1">${escapeHtml(message.content)}</p>
@@ -392,6 +395,13 @@
             const message = input.value.trim();
             
             if (!message || !activeChat) {
+                return;
+            }
+            
+            // Verificar longitud del mensaje
+            const maxLength = parseInt(input.getAttribute('maxlength'));
+            if (message.length > maxLength) {
+                showMessageError(`El mensaje es demasiado largo. Máximo ${maxLength} caracteres.`);
                 return;
             }
             
@@ -418,13 +428,20 @@
                 
                 // Limpiar input
                 input.value = '';
+                document.getElementById('charCount').textContent = `0/${maxLength}`;
+                document.getElementById('charCount').classList.remove('text-warning');
+                document.getElementById('charCount').classList.add('text-muted');
                 
                 // Recargar mensajes para mostrar el nuevo mensaje
                 await loadMessages(activeChat);
                 
             } catch (error) {
                 console.error('Error al enviar mensaje:', error);
-                showError('Error al enviar el mensaje: ' + error.message);
+                if (error.message && error.message.includes('largo')) {
+                    showMessageError('El mensaje es demasiado largo para el servidor.');
+                } else {
+                    showMessageError('Error al enviar el mensaje: ' + error.message);
+                }
             }
         }
 
@@ -452,7 +469,44 @@
                 </div>
             `;
         }
-
+        
+        // Mostrar error específico para mensajes sin afectar el área de chat
+        function showMessageError(message) {
+            // Crear un elemento toast para mostrar el error
+            const toastContainer = document.createElement('div');
+            toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+            toastContainer.style.zIndex = '5';
+            toastContainer.innerHTML = `
+                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header bg-danger text-white">
+                        <i class="bi bi-exclamation-circle me-2"></i>
+                        <strong class="me-auto">Error</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(toastContainer);
+            
+            // Eliminar el toast después de 5 segundos
+            setTimeout(() => {
+                toastContainer.querySelector('.toast').classList.remove('show');
+                setTimeout(() => toastContainer.remove(), 500);
+            }, 5000);
+            
+            // Agregar evento al botón de cerrar
+            const closeBtn = toastContainer.querySelector('.btn-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    toastContainer.querySelector('.toast').classList.remove('show');
+                    setTimeout(() => toastContainer.remove(), 500);
+                });
+            }
+        }
+        
         // Iniciar polling de mensajes nuevos
         function startMessagePolling(groupId) {
             // Detener intervalo anterior si existe
@@ -601,13 +655,72 @@
             }
         }
         
-        /* Asegurar que los estilos flex no interfieran con los componentes de navegación */
+        /* Asegurar que los estilos flex no interfieran con la navbar, menudo desastre*/
         .navbar, 
         .navbar-collapse, 
         .navbar-nav,
         .nav-item,
         .navbar .container-fluid > * {
             min-height: auto;
+        }
+        
+        /* Estilos para los mensajes del chat */
+        .message-card {
+            display: inline-block !important; /* Hace que el card se adapte al contenido */
+            width: auto !important;
+            max-width: 70% !important;
+            flex: none !important; /* Evita que los estilos flex afecten a los mensajes */
+            border-radius: 1rem !important;
+            margin-bottom: 0.5rem;
+        }
+        
+        .message-card .card-body {
+            width: auto;
+            display: inline-block;
+            padding: 0.75rem 1rem !important;
+        }
+        
+        #messagesArea p.mb-1 {
+            word-break: break-word; /* Permite que palabras largas se rompan */
+            white-space: pre-wrap; /* Respeta saltos de línea y espacios */
+            margin-bottom: 0.25rem !important;
+        }
+        
+        /* Mensajes propios (a la derecha) */
+        .justify-content-end .message-card {
+            border-top-right-radius: 0.25rem !important;
+        }
+        
+        /* Mensajes de otros (a la izquierda) */
+        .justify-content-start .message-card {
+            border-top-left-radius: 0.25rem !important;
+        }
+        
+        /* Estilos para el contador de caracteres */
+        #charCount {
+            font-size: 0.75rem;
+            transition: color 0.3s;
+        }
+        
+        .text-warning {
+            color: #ffc107 !important;
+        }
+        
+        /* Estilos para los toasts de error */
+        .toast {
+            opacity: 1;
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            background-color: #2b3035;
+            color: #fff;
+        }
+        
+        .toast .toast-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .toast .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(200%);
         }
     </style>
 </body>
