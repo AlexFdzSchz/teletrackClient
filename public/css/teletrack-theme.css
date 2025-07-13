@@ -88,6 +88,13 @@ body {
 .text-info { color: var(--bs-info) !important; }
 .text-light { color: var(--bs-light) !important; }
 .text-dark { color: var(--bs-dark) !important; }
+.text-muted { color: #adb5bd !important; } /* Color más claro para mejor contraste en modo oscuro */
+
+/* Clases adicionales para mejores contrastes en temas oscuros */
+.message-time-muted { color: rgba(255, 255, 255, 0.7) !important; } /* Para timestamps en mensajes */
+.chat-status { color: #bdc6ce !important; } /* Para estados de chat */
+.chat-item-info { color: #a8b2bc !important; } /* Para información secundaria en elementos de chat */
+.empty-state { color: #bdc6ce !important; } /* Para mensajes de estado vacío */
 
 /* Estilo para placeholders en inputs porque no hay manera de leerlos */
 ::placeholder {

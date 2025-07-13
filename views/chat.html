@@ -568,10 +568,13 @@
 
     <style>
         .chat-item.active {
-            background-color: #495057 !important;
+            background-color: #2f3136 !important; /* Color del canal seleccionado en Discord */
+            border-left: 4px solid #7289da !important; /* Borde del color lila-azulado de Discord */
+            position: relative;
+            box-shadow: inset 0px 0px 0px 1px rgba(114, 137, 218, 0.2); /* Sutil brillo interno */
         }
         
-        .chat-item:hover {
+        .chat-item:hover:not(.active) {
             background-color: #3a3f44 !important;
         }
         
@@ -698,26 +701,7 @@
             border-top-left-radius: 0.25rem !important;
         }
         
-        /* Clase específica para los timestamps de mensajes */
-        .message-time-muted {
-            color: rgba(255, 255, 255, 0.7) !important; /* Mejor contraste para fondos oscuros */
-        }
-        
-        /* Estado del chat */
-        .chat-status {
-            color: #bdc6ce !important;
-        }
-        
-        /* Información de los elementos de chat */
-        .chat-item-info {
-            color: #a8b2bc !important;
-        }
-        
-        /* Estados vacíos con mejor contraste */
-        .empty-state {
-            color: #bdc6ce !important;
-        }
-        
+        /* Estilos específicos para iconos en estados vacíos */
         .empty-state i {
             color: #8b949e;
         }
@@ -726,12 +710,6 @@
         #charCount {
             font-size: 0.75rem;
             transition: color 0.3s;
-            color: #adb5bd !important; /* Color más claro para mejor contraste */
-        }
-        
-        /* Mejorar visibilidad de textos muted en tema oscuro */
-        .text-muted {
-            color: #adb5bd !important; /* Gris más claro para mejor contraste en modo oscuro */
         }
         
         .text-warning {
