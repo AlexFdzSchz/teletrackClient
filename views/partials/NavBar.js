@@ -34,15 +34,18 @@ class NavBar extends HTMLElement {
                 <a class="nav-link" href="${viewsPrefix}groups.html">Grupos</a>
               </li>
               <li class="nav-item">
+                <a class="nav-link" href="${viewsPrefix}chat.html">Chat</a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link" href="${viewsPrefix}options.html">Opciones</a>
               </li>
             </ul>
-            
-            <div class="d-flex align-items-center">
-              ${isUserLoggedIn ? `
-                <div class="d-flex align-items-center text-light me-3">
-                  <i class="bi bi-person-circle me-2 fs-5"></i>
-                  <span>${userName}</span>
+            <div class="ms-auto">
+              <div class="d-flex align-items-center">
+                ${isUserLoggedIn ? `
+                  <div class="d-flex align-items-center text-light me-3">
+                    <i class="bi bi-person-circle me-2 fs-5"></i>
+                    <span>${userName}</span>
                 </div>
                 <button class="btn btn-danger" onclick="logout()">Cerrar sesión</button>
               ` : `
