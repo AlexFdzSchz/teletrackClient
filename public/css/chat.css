@@ -1,0 +1,209 @@
+/* Estilos específicos para la página de chat */
+
+.chat-item.active {
+    background-color: #2f3136 !important; /* Color del canal seleccionado en Discord */
+    border-left: 4px solid #7289da !important; /* Borde del color lila-azulado de Discord */
+    position: relative;
+    box-shadow: inset 0px 0px 0px 1px rgba(114, 137, 218, 0.2); /* Sutil brillo interno */
+}
+
+.chat-item:hover:not(.active) {
+    background-color: #3a3f44 !important;
+}
+
+/* Override global para que funcione el overflow */
+body.bg-dark {
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
+main {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    min-height: 0 !important; /* Importante para que el contenido no crezca más allá del viewport */
+    max-height: calc(100vh - 140px) !important; /* Limitar altura: 100vh menos navbar y worksessionbar aproximadamente */
+    overflow: hidden !important; /* Evitar desbordamiento del main */
+}
+
+main > .container-fluid {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; /* Importante para que flex funcione correctamente con overflow */
+    max-height: 100%; /* No exceder la altura del main */
+    overflow: hidden;
+}
+
+main .row {
+    display: flex;
+    flex-direction: row; /* Las columnas deben estar en fila */
+    flex: 1;
+    min-height: 0;
+    max-height: 100%; /* No exceder la altura del contenedor padre */
+    overflow: hidden;
+}
+
+main .col-md-3, 
+main .col-md-9, 
+main .col-lg-3, 
+main .col-lg-9, 
+main .col-xl-25, 
+main .col-xl-75 {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; /* Importante para que flex funcione correctamente con overflow */
+    max-height: 100%; /* No exceder la altura del row */
+    overflow: hidden; /* Evita que el contenido desborde */
+}
+
+/* Clases personalizadas para la proporción 25%-75% */
+@media (min-width: 1200px) {
+    .col-xl-25 {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+    
+    .col-xl-75 {
+        flex: 0 0 75%;
+        max-width: 75%;
+    }
+}
+
+/* Restaurar estilos Bootstrap originales para navbar */
+.navbar .container-fluid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: inherit;
+    align-items: center;
+    justify-content: space-between;
+    min-height: auto;
+}
+
+main .card {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; /* Importante para que flex funcione correctamente con overflow, como para saberlo */
+    max-height: 100%; /* Importante para no exceder la altura del contenedor padre */
+    overflow: hidden; 
+}
+
+/* Área de mensajes con scroll controlado */
+#messagesArea {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0; 
+    max-height: 100%; 
+}
+
+/* Lista de chats con scroll controlado */
+#chatList {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    max-height: 100%;
+}
+
+/* Asegurar que el card-body de la lista de chats también tenga scroll */
+.card-body.overflow-auto {
+    flex: 1;
+    overflow-y: auto !important;
+    min-height: 0;
+    max-height: 100%; /* No exceder la altura de la card */
+}
+
+/* Restaurar estilos de los componentes de la navegación */
+.navbar-nav {
+    display: flex;
+    flex-direction: row;
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+    flex-wrap: wrap;
+}
+
+@media (min-width: 992px) {
+    .navbar-expand-lg .navbar-collapse {
+        display: flex !important;
+        flex-basis: auto;
+    }
+    
+    .navbar-expand-lg .navbar-nav {
+        flex-direction: row;
+    }
+}
+
+/* Asegurar que los estilos flex no interfieran con la navbar */
+.navbar, 
+.navbar-collapse, 
+.navbar-nav,
+.nav-item,
+.navbar .container-fluid > * {
+    min-height: auto;
+}
+
+/* Estilos para los mensajes del chat */
+.message-card {
+    display: inline-block !important; /* Hace que el card se adapte al contenido */
+    width: auto !important;
+    max-width: 70% !important;
+    flex: none !important; /* Evita que los estilos flex afecten a los mensajes */
+    border-radius: 1rem !important;
+    margin-bottom: 0.5rem;
+}
+
+.message-card .card-body {
+    width: auto;
+    display: inline-block;
+    padding: 0.75rem 1rem !important;
+}
+
+#messagesArea p.mb-1 {
+    word-break: break-word; /* Permite que palabras largas se rompan */
+    white-space: pre-wrap; /* Respeta saltos de línea y espacios */
+    margin-bottom: 0.25rem !important;
+}
+
+/* Mensajes propios (a la derecha) */
+.justify-content-end .message-card {
+    border-top-right-radius: 0.25rem !important;
+}
+
+/* Mensajes de otros (a la izquierda) */
+.justify-content-start .message-card {
+    border-top-left-radius: 0.25rem !important;
+}
+
+/* Estilos específicos para iconos en estados vacíos */
+.empty-state i {
+    color: #8b949e;
+}
+
+/* Estilos para el contador de caracteres */
+#charCount {
+    font-size: 0.75rem;
+    transition: color 0.3s;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+}
+
+/* Estilos para los toasts de error */
+.toast {
+    opacity: 1;
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    background-color: #2b3035;
+    color: #fff;
+}
+
+.toast .toast-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toast .btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
