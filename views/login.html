@@ -27,6 +27,10 @@
                             Correo electrónico o contraseña incorrectos.
                         </div>
                         
+                        <div class="alert alert-success d-none" id="loginSuccess" role="alert">
+                            Sesión cerrada correctamente.
+                        </div>
+                        
                         <form id="loginForm">
                             <div class="mb-3">
                                 <label for="email" class="form-label text-light">Correo electrónico</label>
@@ -97,12 +101,46 @@
     <script src="../public/js/auth.js"></script>
     <script type="module" src="partials/Footer.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Si ya está autenticado, redirige.
-            if (isAuthenticated()) {
-                window.location.href = '../index.html';
-                return;
+        document.addEventListener('DOMContentLoaded', async function() {
+            
+            // Función para mostrar errores/mensajes basados en parámetros de URL
+            function handleUrlParams() {
+                const urlParams = getUrlParams();
+                const errorMessage = urlParams.get('error');
+                const errorType = urlParams.get('error_type');
+                
+                const loginErrorElement = document.getElementById('loginError');
+                const loginSuccessElement = document.getElementById('loginSuccess');
+                
+                // Limpiar mensajes previos
+                clearErrors([loginErrorElement, loginSuccessElement]);
+                
+                if (errorMessage) {
+                    // Determinar si es un mensaje de éxito o error
+                    if (errorType === 'logout_success') {
+                        loginSuccessElement.textContent = errorMessage;
+                        loginSuccessElement.classList.remove('d-none');
+                    } else {
+                        loginErrorElement.textContent = errorMessage;
+                        loginErrorElement.classList.remove('d-none');
+                    }
+                    
+                    // Limpiar parámetros de URL después de 5 segundos
+                    setTimeout(() => {
+                        const url = new URL(window.location);
+                        url.searchParams.delete('error');
+                        url.searchParams.delete('error_type');
+                        window.history.replaceState({}, document.title, url.pathname);
+                        clearErrors([loginErrorElement, loginSuccessElement]);
+                    }, 5000);
+                }
             }
+            
+            // Manejar parámetros de URL al cargar la página
+            handleUrlParams();
+            
+            // Verificar autenticación de forma segura
+            await checkAuthentication();
             
             // Manejar envío del formulario de login.
             document.getElementById('loginForm').addEventListener('submit', async function(e) {
@@ -110,14 +148,16 @@
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
                 const errorElement = document.getElementById('loginError');
+                const successElement = document.getElementById('loginSuccess');
                 
                 try {
-                    errorElement.classList.add('d-none');
+                    // Limpiar mensajes previos
+                    clearErrors([errorElement, successElement]);
+                    
                     await login(email, password);
                     window.location.href = '../';
                 } catch (error) {
-                    errorElement.textContent = error.message || 'Error al iniciar sesión';
-                    errorElement.classList.remove('d-none');
+                    handleError(error, errorElement, 'Error al iniciar sesión');
                 }
             });
 
@@ -132,12 +172,12 @@
                 const errorElement = document.getElementById('registerError');
 
                 try {
-                    errorElement.classList.add('d-none');
+                    clearErrors([errorElement]);
+                    
                     await register(firstName, lastName, nickname, email, password);
                     window.location.href = '../';
                 } catch (error) {
-                    errorElement.textContent = error.message || 'Error en el registro';
-                    errorElement.classList.remove('d-none');
+                    handleError(error, errorElement, 'Error en el registro');
                 }
             });
 
@@ -145,11 +185,20 @@
             document.getElementById('showRegister').addEventListener('click', function() {
                 document.getElementById('loginContainer').classList.add('d-none');
                 document.getElementById('registerContainer').classList.remove('d-none');
+                
+                // Limpiar errores al cambiar de formulario
+                const loginError = document.getElementById('loginError');
+                const loginSuccess = document.getElementById('loginSuccess');
+                clearErrors([loginError, loginSuccess]);
             });
 
             document.getElementById('showLogin').addEventListener('click', function() {
                 document.getElementById('registerContainer').classList.add('d-none');
                 document.getElementById('loginContainer').classList.remove('d-none');
+                
+                // Limpiar errores al cambiar de formulario
+                const registerError = document.getElementById('registerError');
+                clearErrors([registerError]);
             });
         });
     </script>
