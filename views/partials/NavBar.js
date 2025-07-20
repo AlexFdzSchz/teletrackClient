@@ -13,7 +13,7 @@ class NavBar extends HTMLElement {
     const viewsPrefix = isInViewsFolder ? './' : './views/';
 
     this.innerHTML = `
-      <nav class="navbar navbar-expand-lg navbar-dark bg-secondary sticky-top">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
         <div class="container-fluid">
           <a class="navbar-brand" href="${homeUrl}">TeleTrack</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 

@@ -7,7 +7,7 @@ class WorkSessionBar extends HTMLElement {
 
   connectedCallback() {
     this.innerHTML = `
-      <div class="bg-secondary border-top text-white py-4 sticky-bottom shadow-lg" id="workSessionBar">
+      <div class="bg-secondary border-top text-white py-4 shadow-lg" id="workSessionBar">
         <div class="container-fluid px-4">
           <div class="row align-items-center text-center">
             
