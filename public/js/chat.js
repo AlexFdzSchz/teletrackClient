@@ -41,12 +41,17 @@ document.addEventListener('DOMContentLoaded', function () {
             const charCount = document.getElementById('charCount');
             charCount.textContent = `${currentLength}/${maxLength}`;
             
-            // Cambiar color cuando se acerca al límite
-            if (currentLength > maxLength * 0.8) {
-                charCount.classList.remove('text-muted');
+            // Cambiar color según el porcentaje usado
+            charCount.classList.remove('text-muted', 'text-warning', 'text-danger');
+            
+            if (currentLength > maxLength * 0.9) {
+                // Más del 90% - rojo (peligro)
+                charCount.classList.add('text-danger');
+            } else if (currentLength > maxLength * 0.8) {
+                // Más del 80% - amarillo (advertencia)
                 charCount.classList.add('text-warning');
             } else {
-                charCount.classList.remove('text-warning');
+                // Normal - gris
                 charCount.classList.add('text-muted');
             }
         });
@@ -333,9 +338,10 @@ async function sendMessage() {
         
         // Limpiar input
         input.value = '';
-        document.getElementById('charCount').textContent = `0/${maxLength}`;
-        document.getElementById('charCount').classList.remove('text-warning');
-        document.getElementById('charCount').classList.add('text-muted');
+        const charCount = document.getElementById('charCount');
+        charCount.textContent = `0/${maxLength}`;
+        charCount.classList.remove('text-warning', 'text-danger');
+        charCount.classList.add('text-muted');
         
         // Recargar mensajes para mostrar el nuevo mensaje
         await loadMessages(activeChat);

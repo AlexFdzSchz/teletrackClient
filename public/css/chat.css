@@ -184,7 +184,26 @@ main .card {
 /* Estilos para el contador de caracteres */
 #charCount {
     font-size: 0.75rem;
-    transition: color 0.3s;
+    transition: color 0.3s ease;
+    font-weight: 500;
+}
+
+#charCount.text-warning {
+    color: #ffc107 !important;
+}
+
+#charCount.text-danger {
+    color: #dc3545 !important;
+}
+
+/* Estilos para el área de input de mensajes */
+.card-footer .input-group {
+    border-radius: 0.375rem;
+}
+
+.card-footer .form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    border-color: #86b7fe;
 }
 
 .text-warning {
