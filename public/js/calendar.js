@@ -301,14 +301,13 @@ function getSessionHoursInDay(session, dateKey) {
     const start = new Date(session.startTime);
     const end = new Date(session.endTime);
     
-    // Crear fechas para el inicio y fin del día objetivo
-    const targetDate = new Date(dateKey + 'T00:00:00');
-    const dayStart = new Date(targetDate);
-    const dayEnd = new Date(targetDate);
-    dayEnd.setDate(dayEnd.getDate() + 1); // 00:00 del día siguiente
+    // Crear fechas para el inicio y fin del día objetivo en zona horaria local
+    const [year, month, day] = dateKey.split('-');
+    const dayStart = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 0, 0, 0);
+    const dayEnd = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 23, 59, 59, 999);
     
     // Si la sesión no toca este día, retornar 0
-    if (end <= dayStart || start >= dayEnd) {
+    if (end <= dayStart || start > dayEnd) {
         return 0;
     }
     
@@ -324,19 +323,22 @@ function sessionTouchesDay(session, dateKey) {
     const start = new Date(session.startTime);
     const end = session.endTime ? new Date(session.endTime) : new Date();
     
-    // Crear fechas para el inicio y fin del día objetivo
-    const targetDate = new Date(dateKey + 'T00:00:00');
-    const dayStart = new Date(targetDate);
-    const dayEnd = new Date(targetDate);
-    dayEnd.setDate(dayEnd.getDate() + 1); // 00:00 del día siguiente
+    // Crear fechas para el inicio y fin del día objetivo en zona horaria local
+    const [year, month, day] = dateKey.split('-');
+    const dayStart = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 0, 0, 0);
+    const dayEnd = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 23, 59, 59, 999);
     
     // La sesión toca el día si hay superposición
-    return !(end <= dayStart || start >= dayEnd);
+    return !(end <= dayStart || start > dayEnd);
 }
 
 // Formatear fecha como clave
 function formatDateKey(date) {
-    return date.toISOString().split('T')[0];
+    // Usar getFullYear, getMonth, getDate para evitar problemas de zona horaria
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 // Formatear horas
@@ -405,11 +407,10 @@ function renderDaySessions(sessions, dayKey) {
         const dayHours = getSessionHoursInDay(session, dayKey);
         const isMultiDay = session.endTime && formatDateKey(start) !== formatDateKey(new Date(session.endTime));
         
-        // Crear fechas para el día objetivo
-        const targetDate = new Date(dayKey + 'T00:00:00');
-        const dayStart = new Date(targetDate);
-        const dayEnd = new Date(targetDate);
-        dayEnd.setDate(dayEnd.getDate() + 1);
+        // Crear fechas para el día objetivo en zona horaria local
+        const [year, month, day] = dayKey.split('-');
+        const dayStart = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 0, 0, 0);
+        const dayEnd = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 23, 59, 59, 999);
         
         // Calcular horas efectivas mostradas para este día
         const effectiveStart = start < dayStart ? dayStart : start;
