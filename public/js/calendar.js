@@ -145,7 +145,12 @@ function generateCalendar() {
     // Obtener primer día del mes y último día
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
-    const firstDayWeek = firstDay.getDay();
+    
+    // Ajustar para que las semanas empiecen por lunes (0=domingo, 1=lunes, etc.)
+    // Convertir: domingo=0 -> 6, lunes=1 -> 0, martes=2 -> 1, etc.
+    let firstDayWeek = firstDay.getDay();
+    firstDayWeek = (firstDayWeek === 0) ? 6 : firstDayWeek - 1;
+    
     const daysInMonth = lastDay.getDate();
 
     const calendarGrid = document.getElementById('calendarGrid');
@@ -196,13 +201,40 @@ function generateCalendar() {
     }
     
     let nextMonthDay = 1;
+    
+    // Completar la fila actual
     while (currentRow.children.length < 7) {
         const dayElement = createDayElement(nextMonthDay, nextMonthYear, nextMonthIndex, true);
         currentRow.appendChild(dayElement);
         nextMonthDay++;
     }
-
+    
     calendarGrid.appendChild(currentRow);
+    
+    // Asegurar que siempre hay 6 filas (42 días total) para consistencia visual
+    while (calendarGrid.children.length < 6) {
+        currentRow = document.createElement('div');
+        currentRow.className = 'row mb-1';
+        
+        for (let i = 0; i < 7; i++) {
+            const dayElement = createDayElement(nextMonthDay, nextMonthYear, nextMonthIndex, true);
+            currentRow.appendChild(dayElement);
+            nextMonthDay++;
+            
+            // Si llegamos al final del mes siguiente, ajustar al siguiente mes
+            const nextMonthLastDay = new Date(nextMonthYear, nextMonthIndex + 1, 0).getDate();
+            if (nextMonthDay > nextMonthLastDay) {
+                nextMonthDay = 1;
+                nextMonthIndex++;
+                if (nextMonthIndex > 11) {
+                    nextMonthIndex = 0;
+                    nextMonthYear++;
+                }
+            }
+        }
+        
+        calendarGrid.appendChild(currentRow);
+    }
 }
 
 // Crear elemento de día del calendario
