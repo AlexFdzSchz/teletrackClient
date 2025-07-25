@@ -4,93 +4,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeleTrack - Dashboard</title>
+    <title>TeleTrack - Calendario de Trabajo</title>
     <link href="./node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="./node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="./public/css/teletrack-theme.css" rel="stylesheet">
+    <link href="./public/css/calendar.css" rel="stylesheet">
     <script src="./config.js"></script>
     <script src="./public/js/auth.js"></script>
     <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script>
+        // Verificar autenticación
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!isAuthenticated()) {
+                window.location.href = './views/login.html';
+            }
+        });
+    </script>
 </head>
 
 <body class="bg-dark d-flex flex-column h-100">
     <nav-bar></nav-bar>
     <main class="flex-grow-1 py-4">
-        <div class="container mt-5">
-            <div class="row">
-                <div class="col-lg-8">
-                    <h1 class="text-light">Bienvenido a TeleTrack</h1>
-                    <p class="text-light">Esto es un mockup, nada de esto funciona :D</p>
-                    
-                    <div class="card bg-secondary text-light mt-4">
-                        <div class="card-body">
-                            <h5 class="card-title">Estadísticas</h5>
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <div class="p-3 bg-dark rounded text-center">
-                                        <i class="bi bi-camera-video-fill fs-1 text-primary"></i>
-                                        <h3 class="mt-2" id="sessionCount">--</h3>
-                                        <p>Sesiones totales</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="p-3 bg-dark rounded text-center">
-                                        <i class="bi bi-people-fill fs-1 text-success"></i>
-                                        <h3 class="mt-2" id="groupCount">--</h3>
-                                        <p>Grupos activos</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="p-3 bg-dark rounded text-center">
-                                        <i class="bi bi-calendar-week fs-1 text-warning"></i>
-                                        <h3 class="mt-2" id="upcomingCount">--</h3>
-                                        <p>Próximas sesiones</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="container mt-4">
+            <!-- Header con navegación del calendario -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="text-light">
+                    <i class="bi bi-calendar3 me-2"></i>Calendario de Trabajo
+                </h1>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-outline-primary btn-sm" id="prevMonth">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <h5 class="text-light mb-0 mx-3" id="currentMonth"></h5>
+                    <button class="btn btn-outline-primary btn-sm" id="nextMonth">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
 
-                    <div class="card bg-secondary text-light mt-4">
-                        <div class="card-body">
-                            <h5 class="card-title">Acciones rápidas</h5>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <a href="./views/sessions.html" class="btn btn-primary w-100">
-                                        <i class="bi bi-camera-video-fill me-2"></i>Gestionar Sesiones
-                                    </a>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <a href="./views/groups.html" class="btn btn-success w-100">
-                                        <i class="bi bi-people-fill me-2"></i>Ver Grupos
-                                    </a>
-                                </div>
-                            </div>
+            <!-- Estadísticas rápidas -->
+            <div class="row mb-4">
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="card bg-secondary text-light">
+                        <div class="card-body text-center">
+                            <i class="bi bi-clock-fill fs-1 text-primary"></i>
+                            <h4 class="mt-2" id="totalHoursMonth">0h</h4>
+                            <p class="mb-0 small">Este mes</p>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-lg-4">
+                <div class="col-md-3 col-6 mb-3">
                     <div class="card bg-secondary text-light">
-                        <div class="card-body">
-                            <h5 class="card-title">Actividad reciente</h5>
-                            <div id="recentActivity">
-                                <p class="text-muted">Cargando actividad...</p>
-                            </div>
+                        <div class="card-body text-center">
+                            <i class="bi bi-calendar-week fs-1 text-success"></i>
+                            <h4 class="mt-2" id="workDaysMonth">0</h4>
+                            <p class="mb-0 small">Días trabajados</p>
                         </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="card bg-secondary text-light">
+                        <div class="card-body text-center">
+                            <i class="bi bi-bar-chart-fill fs-1 text-warning"></i>
+                            <h4 class="mt-2" id="avgHoursDay">0h</h4>
+                            <p class="mb-0 small">Promedio/día</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="card bg-secondary text-light">
+                        <div class="card-body text-center">
+                            <i class="bi bi-list-ul fs-1 text-info"></i>
+                            <h4 class="mt-2" id="totalSessions">0</h4>
+                            <p class="mb-0 small">Sesiones</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendario -->
+            <div class="card bg-secondary text-light">
+                <div class="card-body p-3">
+                    <!-- Días de la semana -->
+                    <div class="row mb-2">
+                        <div class="col text-center fw-bold small">Dom</div>
+                        <div class="col text-center fw-bold small">Lun</div>
+                        <div class="col text-center fw-bold small">Mar</div>
+                        <div class="col text-center fw-bold small">Mié</div>
+                        <div class="col text-center fw-bold small">Jue</div>
+                        <div class="col text-center fw-bold small">Vie</div>
+                        <div class="col text-center fw-bold small">Sáb</div>
+                    </div>
+                    
+                    <!-- Días del calendario -->
+                    <div id="calendarGrid">
+                        <!-- Se generará dinámicamente -->
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- Modal para sesiones del día -->
+    <div class="modal fade" id="daySessionsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-secondary text-light">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-calendar-day me-2"></i>
+                        Sesiones del <span id="selectedDate"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <strong>Total del día: <span id="dayTotalHours" class="text-success">0h 0m</span></strong>
+                        </div>
+                        <button class="btn btn-primary btn-sm" id="addSessionBtn">
+                            <i class="bi bi-plus-circle me-1"></i>Nueva sesión
+                        </button>
+                    </div>
+                    
+                    <div id="sessionsContainer" style="max-height: 400px; overflow-y: auto;">
+                        <!-- Las sesiones se cargarán aquí -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar sesión -->
+    <div class="modal fade" id="sessionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-secondary text-light">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sessionModalTitle">Nueva Sesión</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="sessionForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="startTime" class="form-label">Hora de inicio</label>
+                            <input type="datetime-local" class="form-control bg-dark text-light border-secondary" 
+                                   id="startTime" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="endTime" class="form-label">Hora de fin</label>
+                            <input type="datetime-local" class="form-control bg-dark text-light border-secondary" 
+                                   id="endTime">
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Descripción</label>
+                            <textarea class="form-control bg-dark text-light border-secondary" 
+                                      id="description" rows="3" placeholder="Descripción de la sesión..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="deleteSessionBtn" style="display: none;">
+                            <i class="bi bi-trash me-1"></i>Eliminar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-1"></i>Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <work-session-bar></work-session-bar>
-    
     <site-footer></site-footer>
+    
     <script type="module" src="./views/partials/NavBar.js"></script>
     <script type="module" src="./views/partials/Footer.js"></script>
     <script type="module" src="./views/partials/WorkSessionBar.js"></script>
+    <script src="./public/js/calendar.js"></script>
     
 </body>
 

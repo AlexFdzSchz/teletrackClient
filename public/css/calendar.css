@@ -1,0 +1,71 @@
+.calendar-day {
+    height: 80px;
+    border: 1px solid #495057;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.calendar-day:hover {
+    background-color: #495057 !important;
+    transform: scale(1.02);
+}
+
+.calendar-day.other-month {
+    opacity: 0.3;
+}
+
+.calendar-day.today {
+    border: 2px solid #0d6efd;
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.3);
+}
+
+.calendar-day.has-work {
+    background-color: rgba(25, 135, 84, 0.2);
+}
+
+.day-number {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.work-hours {
+    font-size: 0.8rem;
+    color: #28a745;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .calendar-day {
+        height: 60px;
+    }
+    
+    .day-number {
+        font-size: 0.8rem;
+    }
+    
+    .work-hours {
+        font-size: 0.7rem;
+    }
+}
+
+.session-item {
+    border-left: 4px solid #0d6efd;
+    transition: all 0.2s ease;
+}
+
+.session-item:hover {
+    background-color: #495057;
+    transform: translateX(5px);
+}
+
+.session-duration {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.session-time {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
