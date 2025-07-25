@@ -127,3 +127,27 @@ input[type="time"]::-webkit-calendar-picker-indicator {
         margin-bottom: 0.5rem;
     }
 }
+
+/* Estilos para sesiones multi-día */
+.multi-day-session {
+    border-left: 4px solid #ffc107 !important; /* Color amarillo para sesiones multi-día */
+    position: relative;
+}
+
+.multi-day-session::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 15px 15px 0;
+    border-color: transparent #ffc107 transparent transparent;
+}
+
+.multi-day-session .small.text-muted {
+    border-top: 1px solid #495057;
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+}

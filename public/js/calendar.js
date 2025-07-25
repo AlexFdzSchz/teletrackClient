@@ -255,15 +255,51 @@ function getWorkHoursForDay(dateKey) {
     }
 
     return workSessions
-        .filter(session => {
-            const sessionDate = new Date(session.startTime);
-            return formatDateKey(sessionDate) === dateKey && session.endTime;
-        })
+        .filter(session => session.endTime) // Solo sesiones terminadas
         .reduce((total, session) => {
-            const start = new Date(session.startTime);
-            const end = new Date(session.endTime);
-            return total + (end - start) / (1000 * 60 * 60); // horas
+            const hoursInDay = getSessionHoursInDay(session, dateKey);
+            return total + hoursInDay;
         }, 0);
+}
+
+// Calcular las horas de una sesión específica que ocurren en un día específico
+function getSessionHoursInDay(session, dateKey) {
+    if (!session.endTime) return 0;
+    
+    const start = new Date(session.startTime);
+    const end = new Date(session.endTime);
+    
+    // Crear fechas para el inicio y fin del día objetivo
+    const targetDate = new Date(dateKey + 'T00:00:00');
+    const dayStart = new Date(targetDate);
+    const dayEnd = new Date(targetDate);
+    dayEnd.setDate(dayEnd.getDate() + 1); // 00:00 del día siguiente
+    
+    // Si la sesión no toca este día, retornar 0
+    if (end <= dayStart || start >= dayEnd) {
+        return 0;
+    }
+    
+    // Calcular el tiempo efectivo en este día
+    const effectiveStart = start < dayStart ? dayStart : start;
+    const effectiveEnd = end > dayEnd ? dayEnd : end;
+    
+    return (effectiveEnd - effectiveStart) / (1000 * 60 * 60); // horas
+}
+
+// Verificar si una sesión toca un día específico
+function sessionTouchesDay(session, dateKey) {
+    const start = new Date(session.startTime);
+    const end = session.endTime ? new Date(session.endTime) : new Date();
+    
+    // Crear fechas para el inicio y fin del día objetivo
+    const targetDate = new Date(dateKey + 'T00:00:00');
+    const dayStart = new Date(targetDate);
+    const dayEnd = new Date(targetDate);
+    dayEnd.setDate(dayEnd.getDate() + 1); // 00:00 del día siguiente
+    
+    // La sesión toca el día si hay superposición
+    return !(end <= dayStart || start >= dayEnd);
 }
 
 // Formatear fecha como clave
@@ -299,17 +335,14 @@ function showDaySessionsModal(date) {
     
     const dayKey = formatDateKey(date);
     
-    // Validar que workSessions sea un array
+    // Obtener todas las sesiones que tocan este día (incluye sesiones multi-día)
     const daySessions = Array.isArray(workSessions) ? 
-        workSessions.filter(session => {
-            const sessionDate = new Date(session.startTime);
-            return formatDateKey(sessionDate) === dayKey;
-        }) : [];
+        workSessions.filter(session => sessionTouchesDay(session, dayKey)) : [];
 
     const totalHours = getWorkHoursForDay(dayKey);
     document.getElementById('dayTotalHours').textContent = formatHours(totalHours);
 
-    renderDaySessions(daySessions);
+    renderDaySessions(daySessions, dayKey);
     
     // Asegurar que no hay otros modales abiertos antes de mostrar este
     setTimeout(() => {
@@ -319,7 +352,7 @@ function showDaySessionsModal(date) {
 }
 
 // Renderizar sesiones del día
-function renderDaySessions(sessions) {
+function renderDaySessions(sessions, dayKey) {
     const container = document.getElementById('sessionsContainer');
     
     if (sessions.length === 0) {
@@ -335,21 +368,68 @@ function renderDaySessions(sessions) {
     container.innerHTML = sessions.map(session => {
         const start = new Date(session.startTime);
         const end = session.endTime ? new Date(session.endTime) : null;
-        const duration = end ? (end - start) / (1000 * 60 * 60) : 0;
+        
+        // Calcular información específica para este día
+        const dayHours = getSessionHoursInDay(session, dayKey);
+        const isMultiDay = session.endTime && formatDateKey(start) !== formatDateKey(new Date(session.endTime));
+        
+        // Crear fechas para el día objetivo
+        const targetDate = new Date(dayKey + 'T00:00:00');
+        const dayStart = new Date(targetDate);
+        const dayEnd = new Date(targetDate);
+        dayEnd.setDate(dayEnd.getDate() + 1);
+        
+        // Calcular horas efectivas mostradas para este día
+        const effectiveStart = start < dayStart ? dayStart : start;
+        const effectiveEnd = end && end > dayEnd ? dayEnd : end;
+        
+        let timeDisplay, durationDisplay;
+        
+        if (isMultiDay) {
+            // Para sesiones multi-día, mostrar el tiempo efectivo en este día
+            const startTime = effectiveStart.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+            const endTime = effectiveEnd ? effectiveEnd.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '00:00';
+            
+            timeDisplay = `${startTime} - ${endTime}`;
+            durationDisplay = `${formatHours(dayHours)} (sesión multi-día)`;
+            
+            // Si la sesión empezó antes de este día
+            if (start < dayStart) {
+                timeDisplay = `00:00 - ${endTime}`;
+            }
+            // Si la sesión termina después de este día
+            if (end && end > dayEnd) {
+                timeDisplay = `${startTime} - 23:59`;
+            }
+        } else {
+            // Para sesiones del mismo día, mostrar normalmente
+            timeDisplay = `${start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+            if (end) {
+                timeDisplay += ` - ${end.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+                durationDisplay = formatHours(dayHours);
+            } else {
+                timeDisplay += ' - En curso';
+                durationDisplay = 'Sesión activa';
+            }
+        }
 
         return `
-            <div class="session-item bg-dark p-3 mb-2 rounded cursor-pointer" 
+            <div class="session-item bg-dark p-3 mb-2 rounded cursor-pointer ${isMultiDay ? 'multi-day-session' : ''}" 
                  onclick="editSession(${session.id})">
                 <div class="d-flex justify-content-between align-items-start">
                     <div class="flex-grow-1">
                         <div class="session-time">
-                            ${start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
-                            ${end ? ` - ${end.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}` : ' - En curso'}
+                            ${timeDisplay}
                         </div>
                         <div class="session-duration mt-1">
-                            ${end ? formatHours(duration) : 'Sesión activa'}
+                            ${durationDisplay}
                         </div>
                         ${session.description ? `<div class="mt-2">${session.description}</div>` : ''}
+                        ${isMultiDay ? `<div class="mt-1 small text-muted">
+                            <i class="bi bi-calendar-range me-1"></i>
+                            Sesión completa: ${start.toLocaleDateString('es-ES')} ${start.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'})} - 
+                            ${end ? end.toLocaleDateString('es-ES') + ' ' + end.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'}) : 'En curso'}
+                        </div>` : ''}
                     </div>
                     <button class="btn btn-outline-primary btn-sm">
                         <i class="bi bi-pencil"></i>
@@ -604,26 +684,37 @@ function updateStatistics() {
         return;
     }
     
-    const monthSessions = workSessions.filter(session => {
-        const sessionDate = new Date(session.startTime);
-        return sessionDate.getFullYear() === year && sessionDate.getMonth() === month;
-    });
-
-    const totalHours = monthSessions.reduce((total, session) => {
-        if (session.endTime) {
-            const start = new Date(session.startTime);
-            const end = new Date(session.endTime);
-            return total + (end - start) / (1000 * 60 * 60);
+    // Calcular estadísticas día por día para el mes actual
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    
+    let totalHours = 0;
+    const workDaysSet = new Set();
+    
+    // Iterar por cada día del mes
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+        const dayKey = formatDateKey(new Date(year, month, day));
+        const dayHours = getWorkHoursForDay(dayKey);
+        
+        if (dayHours > 0) {
+            totalHours += dayHours;
+            workDaysSet.add(dayKey);
         }
-        return total;
-    }, 0);
-
-    const workDays = new Set(monthSessions
-        .filter(session => session.endTime)
-        .map(session => formatDateKey(new Date(session.startTime)))
-    ).size;
-
+    }
+    
+    const workDays = workDaysSet.size;
     const avgHours = workDays > 0 ? totalHours / workDays : 0;
+    
+    // Contar sesiones que tocan este mes (pueden empezar en meses anteriores o siguientes)
+    const monthSessions = workSessions.filter(session => {
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+            const dayKey = formatDateKey(new Date(year, month, day));
+            if (sessionTouchesDay(session, dayKey)) {
+                return true;
+            }
+        }
+        return false;
+    });
 
     document.getElementById('totalHoursMonth').textContent = formatHours(totalHours);
     document.getElementById('workDaysMonth').textContent = workDays;
