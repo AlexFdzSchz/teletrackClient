@@ -69,3 +69,61 @@
     color: #6c757d;
     font-size: 0.9rem;
 }
+
+/* Estilos para el modal de sesiones */
+.modal-content {
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    border-bottom: 1px solid #495057;
+}
+
+.modal-footer {
+    border-top: 1px solid #495057;
+}
+
+/* Estilos para los campos de fecha y hora */
+.form-label.fw-bold {
+    color: #f8f9fa;
+    margin-bottom: 0.75rem;
+}
+
+.form-label.small {
+    color: #adb5bd;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+}
+
+/* Mejorar contraste de los inputs de fecha y hora */
+input[type="date"], 
+input[type="time"] {
+    color-scheme: dark;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+/* Estilos para texto de ayuda */
+.form-text {
+    margin-top: 0.5rem;
+}
+
+/* móviles */
+@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 1rem;
+    }
+    
+    .modal-body {
+        padding: 1rem;
+    }
+    
+    .form-label.fw-bold {
+        margin-bottom: 0.5rem;
+    }
+}

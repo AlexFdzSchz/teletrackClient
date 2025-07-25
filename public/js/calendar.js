@@ -35,6 +35,55 @@ function setupEventListeners() {
 
     document.getElementById('sessionForm').addEventListener('submit', saveSession);
     document.getElementById('deleteSessionBtn').addEventListener('click', deleteSession);
+    
+    // Event listeners para mejorar UX de fecha/hora
+    setupDateTimeListeners();
+}
+
+// Configurar listeners para campos de fecha y hora
+function setupDateTimeListeners() {
+    // Auto-completar fecha de fin cuando se introduce hora de fin
+    document.getElementById('endTime').addEventListener('change', function() {
+        const endDate = document.getElementById('endDate');
+        const startDate = document.getElementById('startDate');
+        
+        // Si se introduce hora de fin pero no fecha de fin, usar fecha de inicio
+        if (this.value && !endDate.value && startDate.value) {
+            endDate.value = startDate.value;
+        }
+    });
+    
+    // Cuando se cambia la hora de inicio, actualizar hora de fin si está vacía
+    document.getElementById('startTime').addEventListener('change', function() {
+        const endTime = document.getElementById('endTime');
+        const endDate = document.getElementById('endDate');
+        const startDate = document.getElementById('startDate');
+        
+        // Si no hay hora de fin configurada, poner 1 hora después
+        if (!endTime.value && this.value) {
+            const [hours, minutes] = this.value.split(':');
+            const startDateTime = new Date();
+            startDateTime.setHours(parseInt(hours), parseInt(minutes));
+            
+            // Añadir 1 hora
+            const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000);
+            endTime.value = endDateTime.toTimeString().slice(0, 5);
+            
+            // Si no hay fecha de fin, usar la misma que inicio
+            if (!endDate.value && startDate.value) {
+                endDate.value = startDate.value;
+            }
+        }
+    });
+    
+    // Validar que fecha de fin no sea anterior a fecha de inicio
+    document.getElementById('endDate').addEventListener('change', function() {
+        const startDate = document.getElementById('startDate');
+        if (startDate.value && this.value && this.value < startDate.value) {
+            alert('La fecha de fin no puede ser anterior a la fecha de inicio');
+            this.value = startDate.value;
+        }
+    });
 }
 
 // Cargar sesiones de trabajo desde la API
@@ -296,8 +345,22 @@ function openSessionModal(session = null) {
     
     if (session) {
         document.getElementById('sessionModalTitle').textContent = 'Editar Sesión';
-        document.getElementById('startTime').value = new Date(session.startTime).toISOString().slice(0, 16);
-        document.getElementById('endTime').value = session.endTime ? new Date(session.endTime).toISOString().slice(0, 16) : '';
+        
+        // Procesar fecha y hora de inicio
+        const startDateTime = new Date(session.startTime);
+        document.getElementById('startDate').value = startDateTime.toISOString().split('T')[0];
+        document.getElementById('startTime').value = startDateTime.toTimeString().slice(0, 5);
+        
+        // Procesar fecha y hora de fin si existe
+        if (session.endTime) {
+            const endDateTime = new Date(session.endTime);
+            document.getElementById('endDate').value = endDateTime.toISOString().split('T')[0];
+            document.getElementById('endTime').value = endDateTime.toTimeString().slice(0, 5);
+        } else {
+            document.getElementById('endDate').value = '';
+            document.getElementById('endTime').value = '';
+        }
+        
         document.getElementById('description').value = session.description || '';
         document.getElementById('deleteSessionBtn').style.display = 'block';
     } else {
@@ -305,16 +368,23 @@ function openSessionModal(session = null) {
         
         // Configurar fecha y hora por defecto
         const now = new Date();
+        let defaultDate;
+        
         if (selectedDateForModal) {
-            const defaultDate = new Date(selectedDateForModal);
-            defaultDate.setHours(now.getHours());
-            defaultDate.setMinutes(now.getMinutes());
-            document.getElementById('startTime').value = defaultDate.toISOString().slice(0, 16);
+            defaultDate = new Date(selectedDateForModal);
         } else {
-            document.getElementById('startTime').value = now.toISOString().slice(0, 16);
+            defaultDate = now;
         }
         
-        document.getElementById('endTime').value = '';
+        // Configurar fecha de inicio
+        document.getElementById('startDate').value = defaultDate.toISOString().split('T')[0];
+        document.getElementById('startTime').value = now.toTimeString().slice(0, 5);
+        
+        // Configurar hora de fin por defecto (1 hora después del inicio)
+        const defaultEndTime = new Date(now.getTime() + 60 * 60 * 1000); // +1 hora
+        document.getElementById('endDate').value = defaultDate.toISOString().split('T')[0]; // Misma fecha que inicio
+        document.getElementById('endTime').value = defaultEndTime.toTimeString().slice(0, 5);
+        
         document.getElementById('description').value = '';
         document.getElementById('deleteSessionBtn').style.display = 'none';
     }
@@ -341,9 +411,51 @@ function editSession(sessionId) {
 async function saveSession(e) {
     e.preventDefault();
     
+    // Combinar fecha y hora para crear datetime completo
+    const startDate = document.getElementById('startDate').value;
+    const startTime = document.getElementById('startTime').value;
+    const endDate = document.getElementById('endDate').value;
+    const endTime = document.getElementById('endTime').value;
+    
+    // Validar campos requeridos - TODOS son obligatorios para nuevas sesiones
+    if (!startDate || !startTime) {
+        alert('Por favor, completa la fecha y hora de inicio');
+        return;
+    }
+    
+    if (!endDate && !endTime) {
+        alert('Por favor, completa la fecha y hora de fin. Las sesiones deben tener un tiempo definido.');
+        return;
+    }
+    
+    if (!endTime) {
+        alert('Por favor, especifica la hora de fin de la sesión');
+        return;
+    }
+    
+    // Crear datetime de inicio
+    const startDateTime = `${startDate}T${startTime}:00`;
+    
+    // Crear datetime de fin - siempre debe existir
+    let endDateTime;
+    if (endDate) {
+        endDateTime = `${endDate}T${endTime}:00`;
+    } else {
+        // Si no hay fecha de fin, usar la misma fecha de inicio
+        endDateTime = `${startDate}T${endTime}:00`;
+    }
+    
+    // Validar que la hora de fin sea posterior a la de inicio
+    const start = new Date(startDateTime);
+    const end = new Date(endDateTime);
+    if (end <= start) {
+        alert('La hora de fin debe ser posterior a la hora de inicio');
+        return;
+    }
+    
     const sessionData = {
-        startTime: document.getElementById('startTime').value,
-        endTime: document.getElementById('endTime').value || null,
+        startTime: startDateTime,
+        endTime: endDateTime,
         description: document.getElementById('description').value || null
     };
 

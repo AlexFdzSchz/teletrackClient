@@ -144,18 +144,53 @@
                 </div>
                 <form id="sessionForm">
                     <div class="modal-body">
+                        <!-- Inicio de sesión -->
                         <div class="mb-3">
-                            <label for="startTime" class="form-label">Hora de inicio</label>
-                            <input type="datetime-local" class="form-control bg-dark text-light border-secondary" 
-                                   id="startTime" required>
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-play-circle me-1"></i>Inicio de sesión
+                            </label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="startDate" class="form-label small">Fecha</label>
+                                    <input type="date" class="form-control bg-dark text-light border-secondary" 
+                                           id="startDate" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="startTime" class="form-label small">Hora</label>
+                                    <input type="time" class="form-control bg-dark text-light border-secondary" 
+                                           id="startTime" required>
+                                </div>
+                            </div>
                         </div>
+                        
+                        <!-- Fin de sesión -->
                         <div class="mb-3">
-                            <label for="endTime" class="form-label">Hora de fin</label>
-                            <input type="datetime-local" class="form-control bg-dark text-light border-secondary" 
-                                   id="endTime">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-stop-circle me-1"></i>Fin de sesión
+                            </label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="endDate" class="form-label small">Fecha</label>
+                                    <input type="date" class="form-control bg-dark text-light border-secondary" 
+                                           id="endDate">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="endTime" class="form-label small">Hora *</label>
+                                    <input type="time" class="form-control bg-dark text-light border-secondary" 
+                                           id="endTime" required>
+                                </div>
+                            </div>
+                            <div class="form-text text-muted small mt-1">
+                                <i class="bi bi-info-circle me-1"></i>
+                                La hora de fin es obligatoria. Si no especificas fecha, se usará la misma fecha de inicio.
+                            </div>
                         </div>
+                        
+                        <!-- Descripción -->
                         <div class="mb-3">
-                            <label for="description" class="form-label">Descripción</label>
+                            <label for="description" class="form-label fw-bold">
+                                <i class="bi bi-card-text me-1"></i>Descripción
+                            </label>
                             <textarea class="form-control bg-dark text-light border-secondary" 
                                       id="description" rows="3" placeholder="Descripción de la sesión..."></textarea>
                         </div>
