@@ -212,6 +212,12 @@ function formatHours(hours) {
 
 // Mostrar modal de sesiones del día
 function showDaySessionsModal(date) {
+    // Cerrar cualquier modal de sesión que pueda estar abierto
+    const sessionModal = bootstrap.Modal.getInstance(document.getElementById('sessionModal'));
+    if (sessionModal) {
+        sessionModal.hide();
+    }
+    
     const dateStr = date.toLocaleDateString('es-ES', { 
         weekday: 'long', 
         year: 'numeric', 
@@ -235,8 +241,11 @@ function showDaySessionsModal(date) {
 
     renderDaySessions(daySessions);
     
-    const modal = new bootstrap.Modal(document.getElementById('daySessionsModal'));
-    modal.show();
+    // Asegurar que no hay otros modales abiertos antes de mostrar este
+    setTimeout(() => {
+        const modal = new bootstrap.Modal(document.getElementById('daySessionsModal'));
+        modal.show();
+    }, 100);
 }
 
 // Renderizar sesiones del día
@@ -364,12 +373,24 @@ async function saveSession(e) {
             const result = await response.json();
             console.log('Sesión guardada:', result);
             
-            bootstrap.Modal.getInstance(document.getElementById('sessionModal')).hide();
-            await loadWorkSessions();
-            
-            if (selectedDateForModal) {
-                showDaySessionsModal(selectedDateForModal);
+            // Cerrar el modal de edición de sesión
+            const sessionModal = bootstrap.Modal.getInstance(document.getElementById('sessionModal'));
+            if (sessionModal) {
+                sessionModal.hide();
             }
+            
+            // Esperar a que el modal se cierre completamente antes de recargar datos
+            setTimeout(async () => {
+                await loadWorkSessions();
+                
+                // Solo reabrir el modal del día si tenemos una fecha seleccionada
+                if (selectedDateForModal) {
+                    // Esperar un poco más para asegurar que el modal anterior se cerró completamente
+                    setTimeout(() => {
+                        showDaySessionsModal(selectedDateForModal);
+                    }, 100);
+                }
+            }, 300);
         } else {
             const error = await response.json();
             const errorMessage = error.message || error.error || 'Error desconocido';
@@ -405,12 +426,24 @@ async function deleteSession() {
             const result = await response.json();
             console.log('Sesión eliminada:', result);
             
-            bootstrap.Modal.getInstance(document.getElementById('sessionModal')).hide();
-            await loadWorkSessions();
-            
-            if (selectedDateForModal) {
-                showDaySessionsModal(selectedDateForModal);
+            // Cerrar el modal de edición de sesión
+            const sessionModal = bootstrap.Modal.getInstance(document.getElementById('sessionModal'));
+            if (sessionModal) {
+                sessionModal.hide();
             }
+            
+            // Esperar a que el modal se cierre completamente antes de recargar datos
+            setTimeout(async () => {
+                await loadWorkSessions();
+                
+                // Solo reabrir el modal del día si tenemos una fecha seleccionada
+                if (selectedDateForModal) {
+                    // Esperar un poco más para asegurar que el modal anterior se cerró completamente
+                    setTimeout(() => {
+                        showDaySessionsModal(selectedDateForModal);
+                    }, 100);
+                }
+            }, 300);
         } else {
             const error = await response.json();
             const errorMessage = error.message || error.error || 'Error al eliminar la sesión';
@@ -464,3 +497,35 @@ function updateStatistics() {
     document.getElementById('avgHoursDay').textContent = formatHours(avgHours);
     document.getElementById('totalSessions').textContent = monthSessions.length;
 }
+
+// Función para limpiar backdrops de modales que puedan quedar colgando
+function cleanupModalBackdrops() {
+    // Eliminar cualquier backdrop que pueda haber quedado
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => {
+        backdrop.remove();
+    });
+    
+    // Asegurar que el body no tenga clases de modal
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+}
+
+// Agregar event listeners para limpiar modales cuando se cierren
+document.addEventListener('DOMContentLoaded', function() {
+    const daySessionsModal = document.getElementById('daySessionsModal');
+    const sessionModal = document.getElementById('sessionModal');
+    
+    if (daySessionsModal) {
+        daySessionsModal.addEventListener('hidden.bs.modal', function() {
+            setTimeout(cleanupModalBackdrops, 100);
+        });
+    }
+    
+    if (sessionModal) {
+        sessionModal.addEventListener('hidden.bs.modal', function() {
+            setTimeout(cleanupModalBackdrops, 100);
+        });
+    }
+});
