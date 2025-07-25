@@ -155,10 +155,21 @@ function generateCalendar() {
     currentRow.className = 'row mb-1';
 
     // Días del mes anterior
-    const prevMonth = new Date(year, month - 1, 0);
+    // Calcular correctamente el mes y año anterior
+    let prevMonthYear = year;
+    let prevMonthIndex = month - 1;
+    
+    if (prevMonthIndex < 0) {
+        prevMonthIndex = 11; // Diciembre
+        prevMonthYear = year - 1;
+    }
+    
+    // Obtener el último día del mes anterior
+    const lastDayOfPrevMonth = new Date(prevMonthYear, prevMonthIndex + 1, 0).getDate();
+    
     for (let i = firstDayWeek - 1; i >= 0; i--) {
-        const dayNum = prevMonth.getDate() - i;
-        const dayElement = createDayElement(dayNum, year, month - 1, true);
+        const dayNum = lastDayOfPrevMonth - i;
+        const dayElement = createDayElement(dayNum, prevMonthYear, prevMonthIndex, true);
         currentRow.appendChild(dayElement);
     }
 
@@ -175,10 +186,20 @@ function generateCalendar() {
     }
 
     // Días del siguiente mes
+    // Calcular correctamente el mes y año siguiente
+    let nextMonthYear = year;
+    let nextMonthIndex = month + 1;
+    
+    if (nextMonthIndex > 11) {
+        nextMonthIndex = 0; // Enero
+        nextMonthYear = year + 1;
+    }
+    
+    let nextMonthDay = 1;
     while (currentRow.children.length < 7) {
-        const dayNum = currentRow.children.length - firstDayWeek - daysInMonth + 1;
-        const dayElement = createDayElement(dayNum, year, month + 1, true);
+        const dayElement = createDayElement(nextMonthDay, nextMonthYear, nextMonthIndex, true);
         currentRow.appendChild(dayElement);
+        nextMonthDay++;
     }
 
     calendarGrid.appendChild(currentRow);
