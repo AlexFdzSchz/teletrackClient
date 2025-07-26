@@ -271,6 +271,46 @@
     transform: translateY(-2px);
 }
 
+/* Override global para que funcione el overflow */
+body.bg-dark {
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
+main {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    min-height: 0 !important; /* Importante para que el contenido no crezca más allá del viewport */
+    max-height: calc(100vh - 140px) !important; /* Limitar altura: 100vh menos navbar y worksessionbar aproximadamente */
+    overflow-y: auto !important; /* Permitir scroll vertical en el main */
+    overflow-x: hidden !important; /* Evitar scroll horizontal */
+}
+
+/* Asegurar que el contenedor tenga la estructura correcta */
+main > .container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    max-height: 100%;
+    overflow: visible; /* Permitir que el contenido se muestre */
+}
+
+/* Asegurar que el contenido tenga margen suficiente */
+.container {
+    margin-bottom: 1rem;
+}
+
+/* Responsive: en pantallas pequeñas, asegurar que no haya problemas de altura */
+@media (max-height: 700px) {
+    main {
+        max-height: calc(100vh - 120px) !important;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+}
+
 /* Mejoras de legibilidad para títulos */
 .card-title {
     color: #f8f9fa !important;
