@@ -2,9 +2,9 @@
 
 .chat-item.active {
     background-color: #2f3136 !important; /* Color del canal seleccionado en Discord */
-    border-left: 4px solid #7289da !important; /* Borde del color lila-azulado de Discord */
+    border-left: 4px solid var(--bs-primary) !important; 
     position: relative;
-    box-shadow: inset 0px 0px 0px 1px rgba(114, 137, 218, 0.2); /* Sutil brillo interno */
+    box-shadow: inset 0px 0px 0px 1px rgba(88, 101, 242, 0.2); 
 }
 
 .chat-item:hover:not(.active) {
