@@ -11,11 +11,15 @@ class NavBar extends HTMLElement {
     const isInViewsFolder = window.location.pathname.includes('/views/');
     const homeUrl = isInViewsFolder ? '../index.html' : './index.html';
     const viewsPrefix = isInViewsFolder ? './' : './views/';
+    const iconPath = isInViewsFolder ? '../public/img/teletrack-icon.svg' : './public/img/teletrack-icon.svg';
 
     this.innerHTML = `
       <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
         <div class="container-fluid">
-          <a class="navbar-brand" href="${homeUrl}">TeleTrack</a>
+          <a class="navbar-brand d-flex align-items-center gap-2" href="${homeUrl}">
+            <img src="${iconPath}" alt="TeleTrack Icon" width="32" height="32">
+            <span>TeleTrack</span>
+          </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
                   data-bs-target="#navbarMain" aria-controls="navbarMain" 
                   aria-expanded="false" aria-label="Alternar navegación">
@@ -46,11 +50,12 @@ class NavBar extends HTMLElement {
                   <div class="d-flex align-items-center text-light me-3">
                     <i class="bi bi-person-circle me-2 fs-5"></i>
                     <span>${userName}</span>
-                </div>
-                <button class="btn btn-danger" onclick="logout()">Cerrar sesión</button>
-              ` : `
-                <a href="${isInViewsFolder ? './login.html' : './views/login.html'}" class="btn btn-primary">Iniciar sesión</a>
-              `}
+                  </div>
+                  <button class="btn btn-danger" onclick="logout()">Cerrar sesión</button>
+                ` : `
+                  <a href="${isInViewsFolder ? './login.html' : './views/login.html'}" class="btn btn-primary">Iniciar sesión</a>
+                `}
+              </div>
             </div>
           </div>
         </div>
