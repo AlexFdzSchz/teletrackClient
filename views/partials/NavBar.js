@@ -28,7 +28,7 @@ class NavBar extends HTMLElement {
                 <a class="nav-link" href="${homeUrl}">Inicio</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="${viewsPrefix}sessions.html">Sesiones</a>
+                <a class="nav-link" href="${viewsPrefix}download.html">Descarga</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="${viewsPrefix}groups.html">Grupos</a>

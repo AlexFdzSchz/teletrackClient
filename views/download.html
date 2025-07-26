@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleTrack - Sesiones</title>
+    <link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../public/css/teletrack-theme.css" rel="stylesheet">
+    <script src="../config.js"></script>
+    <script src="../public/js/auth.js"></script>
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Verificar autenticación
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!isAuthenticated()) {
+                window.location.href = './login.html';
+            }
+        });
+    </script>
+</head>
+
+<body class="bg-dark d-flex flex-column h-100">
+
+</body>
+
+</html>
