@@ -55,7 +55,7 @@
                                         <div class="row g-3">
                                             <!-- Esta semana -->
                                             <div class="col-lg-4 col-md-6">
-                                                <input type="radio" class="btn-check period-radio" name="periodOption" id="thisWeek" value="thisWeek" checked>
+                                                <input type="radio" class="btn-check period-radio" name="periodOption" id="thisWeek" value="thisWeek">
                                                 <label class="btn btn-outline-primary w-100 period-option" for="thisWeek">
                                                     <div class="period-card">
                                                         <div class="period-icon">
@@ -171,12 +171,30 @@
                                 </div>
                             </div>
 
-                            <!-- Estado de carga -->
+                            <!-- Estado de carga mejorado -->
                             <div id="loadingState" class="text-center py-5 d-none">
-                                <div class="spinner-border text-primary mb-3" role="status">
-                                    <span class="visually-hidden">Cargando...</span>
+                                <div class="d-flex justify-content-center align-items-center mb-4">
+                                    <div class="spinner-border text-primary me-3" style="width: 3rem; height: 3rem;" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                    <div class="spinner-grow text-primary" style="width: 1rem; height: 1rem; animation-delay: 0.2s;" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                    <div class="spinner-grow text-primary mx-2" style="width: 1rem; height: 1rem; animation-delay: 0.4s;" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                    <div class="spinner-grow text-primary" style="width: 1rem; height: 1rem; animation-delay: 0.6s;" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
                                 </div>
-                                <p class="text-muted">Generando reporte...</p>
+                                <h5 class="text-primary mb-2">
+                                    <i class="bi bi-gear-fill me-2"></i>Generando reporte
+                                </h5>
+                                <p class="text-muted mb-0">Procesando tus sesiones de trabajo...</p>
+                                <div class="progress mt-3" style="height: 4px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                                         role="progressbar" style="width: 100%"></div>
+                                </div>
                             </div>
 
                             <!-- Estado sin datos -->

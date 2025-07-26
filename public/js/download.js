@@ -8,10 +8,8 @@ let reportData = null;
 document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     loadWorkSessions().then(() => {
-        // Generar reporte inicial con la opción por defecto (Esta semana)
-        setTimeout(() => {
-            generateReport();
-        }, 500);
+        // Mostrar estado inicial sin datos en lugar de generar reporte automáticamente
+        showInitialState();
     });
 });
 
@@ -35,19 +33,32 @@ function setupEventListeners() {
 function handlePeriodChange(e) {
     const value = e.target.value;
     const customFields = document.getElementById('customDateFields');
+    const selectedLabel = e.target.nextElementSibling;
     
+    // Limpiar cualquier animación previa para evitar conflictos
+    if (selectedLabel) {
+        selectedLabel.classList.remove('clicked');
+        // Forzar reflow para asegurar que la clase se removió
+        selectedLabel.offsetHeight;
+        // Añadir efecto visual de click más sutil
+        selectedLabel.classList.add('clicked');
+        setTimeout(() => {
+            selectedLabel.classList.remove('clicked');
+        }, 200);
+    }
+    
+    // Mostrar/ocultar campos de fecha personalizada
     if (value === 'customRange') {
         customFields.style.display = 'block';
         setupDefaultCustomDates();
-        // Para rango personalizado, generar reporte después de configurar fechas por defecto
-        setTimeout(() => {
-            generateReport();
-        }, 100);
     } else {
         customFields.style.display = 'none';
-        // Para opciones predefinidas, generar reporte inmediatamente
-        generateReport();
     }
+    
+    // Generar reporte con un delay mínimo para UX
+    setTimeout(() => {
+        generateReport();
+    }, 100);
 }
 
 // Configurar fechas por defecto para rango personalizado
@@ -67,12 +78,15 @@ function validateDateRange() {
     if (startDate && endDate && startDate > endDate) {
         alert('La fecha de inicio no puede ser posterior a la fecha de fin');
         document.getElementById('endDate').value = startDate;
+        return;
     }
     
     // Si estamos en modo personalizado y ambas fechas están seleccionadas, regenerar reporte
     const selectedPeriod = document.querySelector('input[name="periodOption"]:checked');
     if (selectedPeriod && selectedPeriod.value === 'customRange' && startDate && endDate) {
-        generateReport();
+        setTimeout(() => {
+            generateReport();
+        }, 100);
     }
 }
 
@@ -113,6 +127,11 @@ async function loadWorkSessions() {
 
 // Generar reporte
 async function generateReport() {
+    // Limpiar cualquier spinner previo en las tarjetas
+    document.querySelectorAll('.period-card.generating').forEach(card => {
+        card.classList.remove('generating');
+    });
+    
     // Mostrar indicador de carga en la tarjeta seleccionada
     const selectedRadio = document.querySelector('input[name="periodOption"]:checked');
     const selectedCard = selectedRadio ? selectedRadio.nextElementSibling.querySelector('.period-card') : null;
@@ -125,7 +144,7 @@ async function generateReport() {
     
     try {
         // Obtener período seleccionado de los radio buttons
-        const selectedPeriod = document.querySelector('input[name="periodOption"]:checked').value;
+        const selectedPeriod = selectedRadio.value;
         const dateRange = getDateRange(selectedPeriod);
         
         if (!dateRange) {
@@ -156,7 +175,7 @@ async function generateReport() {
         hideLoadingState();
         alert('Error al generar el reporte');
     } finally {
-        // Quitar indicador de carga
+        // Asegurar que se quite el indicador de carga
         if (selectedCard) {
             selectedCard.classList.remove('generating');
         }
@@ -286,6 +305,7 @@ function showReportPreview(data) {
     // Mostrar vista previa
     document.getElementById('reportPreview').classList.remove('d-none');
     document.getElementById('noDataState').classList.add('d-none');
+    hideInitialMessage();
 }
 
 // Renderizar tabla de sesiones
@@ -432,6 +452,7 @@ function showLoadingState() {
     document.getElementById('loadingState').classList.remove('d-none');
     document.getElementById('reportPreview').classList.add('d-none');
     document.getElementById('noDataState').classList.add('d-none');
+    hideInitialMessage();
 }
 
 function hideLoadingState() {
@@ -441,11 +462,50 @@ function hideLoadingState() {
 function showNoDataState() {
     document.getElementById('noDataState').classList.remove('d-none');
     document.getElementById('reportPreview').classList.add('d-none');
+    hideInitialMessage();
 }
 
 function hideReportPreview() {
     document.getElementById('reportPreview').classList.add('d-none');
     document.getElementById('noDataState').classList.add('d-none');
+}
+
+function showInitialState() {
+    document.getElementById('reportPreview').classList.add('d-none');
+    document.getElementById('noDataState').classList.add('d-none');
+    document.getElementById('loadingState').classList.add('d-none');
+    
+    // Mostrar mensaje inicial
+    showInitialMessage();
+}
+
+function showInitialMessage() {
+    // Crear o mostrar elemento de estado inicial
+    let initialState = document.getElementById('initialState');
+    if (!initialState) {
+        // Crear el elemento si no existe
+        const reportContainer = document.getElementById('reportPreview').parentNode;
+        initialState = document.createElement('div');
+        initialState.id = 'initialState';
+        initialState.className = 'text-center py-5';
+        initialState.innerHTML = `
+            <div class="text-primary mb-3">
+                <i class="bi bi-calendar-check fs-1"></i>
+            </div>
+            <h5 class="text-light mb-2">Selecciona un período</h5>
+            <p class="text-muted">Elige una de las opciones de arriba para generar tu reporte de horas trabajadas.</p>
+        `;
+        reportContainer.appendChild(initialState);
+    }
+    
+    initialState.classList.remove('d-none');
+}
+
+function hideInitialMessage() {
+    const initialState = document.getElementById('initialState');
+    if (initialState) {
+        initialState.classList.add('d-none');
+    }
 }
 
 function formatHours(hours) {
