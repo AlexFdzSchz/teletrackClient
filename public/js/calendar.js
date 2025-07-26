@@ -345,6 +345,12 @@ function formatDateKey(date) {
 function formatHours(hours) {
     const h = Math.floor(hours);
     const m = Math.round((hours - h) * 60);
+    
+    // Corregir el caso donde los minutos se redondean a 60
+    if (m >= 60) {
+        return formatHours(h + 1);
+    }
+    
     if (h === 0) return `${m}m`;
     if (m === 0) return `${h}h`;
     return `${h}h ${m}m`;
