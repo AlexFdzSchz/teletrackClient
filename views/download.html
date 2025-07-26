@@ -4,13 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeleTrack - Sesiones</title>
+    <title>TeleTrack - Descargas</title>
     <link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="../public/css/teletrack-theme.css" rel="stylesheet">
+    <link href="../public/css/download.css" rel="stylesheet">
     <script src="../config.js"></script>
     <script src="../public/js/auth.js"></script>
     <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jsPDF para generar PDFs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         // Verificar autenticación
         document.addEventListener('DOMContentLoaded', function () {
@@ -21,8 +24,183 @@
     </script>
 </head>
 
-<body class="bg-dark d-flex flex-column h-100">
+<body class="bg-dark d-flex flex-column h-100 text-light">
+    <!-- Navegación -->
+    <nav-bar></nav-bar>
 
+    <!-- Contenido principal -->
+    <main class="flex-grow-1 py-4">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-10">
+                    <div class="text-center mb-4">
+                        <h1 class="display-5 fw-bold text-primary">
+                            <i class="bi bi-download me-3"></i>Descargas
+                        </h1>
+                        <p class="lead text-muted">Descarga tus reportes de horas trabajadas en formato PDF</p>
+                    </div>
+
+                    <!-- Tarjeta principal -->
+                    <div class="card bg-secondary border-0 shadow-lg">
+                        <div class="card-body p-4">
+                            <!-- Filtros de fecha -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h5 class="card-title mb-3">
+                                        <i class="bi bi-calendar-range me-2"></i>Seleccionar período
+                                    </h5>
+                                    
+                                    <!-- Selector de período avanzado con radio buttons -->
+                                    <div class="period-selector-container">
+                                        <div class="row g-3">
+                                            <!-- Esta semana -->
+                                            <div class="col-lg-4 col-md-6">
+                                                <input type="radio" class="btn-check period-radio" name="periodOption" id="thisWeek" value="thisWeek" checked>
+                                                <label class="btn btn-outline-primary w-100 period-option" for="thisWeek">
+                                                    <div class="period-card">
+                                                        <div class="period-icon">
+                                                            <i class="bi bi-calendar-week fs-1"></i>
+                                                        </div>
+                                                        <div class="period-title">Esta semana</div>
+                                                        <div class="period-description">Lunes a domingo actual</div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            
+                                            <!-- Este mes -->
+                                            <div class="col-lg-4 col-md-6">
+                                                <input type="radio" class="btn-check period-radio" name="periodOption" id="thisMonth" value="thisMonth">
+                                                <label class="btn btn-outline-primary w-100 period-option" for="thisMonth">
+                                                    <div class="period-card">
+                                                        <div class="period-icon">
+                                                            <i class="bi bi-calendar-month fs-1"></i>
+                                                        </div>
+                                                        <div class="period-title">Este mes</div>
+                                                        <div class="period-description">Mes completo actual</div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            
+                                            <!-- Rango personalizado -->
+                                            <div class="col-lg-4 col-md-12">
+                                                <input type="radio" class="btn-check period-radio" name="periodOption" id="customRange" value="customRange">
+                                                <label class="btn btn-outline-primary w-100 period-option" for="customRange">
+                                                    <div class="period-card">
+                                                        <div class="period-icon">
+                                                            <i class="bi bi-calendar-range fs-1"></i>
+                                                        </div>
+                                                        <div class="period-title">Personalizado</div>
+                                                        <div class="period-description">Elige tus fechas</div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campos de fecha personalizada -->
+                                    <div id="customDateFields" class="row g-3" style="display: none;">
+                                        <div class="col-md-6">
+                                            <label for="startDate" class="form-label">Fecha de inicio</label>
+                                            <input type="date" class="form-control bg-dark text-light border-secondary" id="startDate">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="endDate" class="form-label">Fecha de fin</label>
+                                            <input type="date" class="form-control bg-dark text-light border-secondary" id="endDate">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Vista previa del reporte -->
+                            <div id="reportPreview" class="d-none">
+                                <hr class="my-4">
+                                <h5 class="mb-3">
+                                    <i class="bi bi-eye me-2"></i>Vista previa del reporte
+                                </h5>
+                                
+                                <!-- Resumen -->
+                                <div class="row mb-4">
+                                    <div class="col-md-3 col-6 text-center">
+                                        <div class="bg-dark p-3 rounded">
+                                            <div class="text-primary fs-4 fw-bold" id="totalHours">0h</div>
+                                            <div class="text-muted small">Total de horas</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6 text-center">
+                                        <div class="bg-dark p-3 rounded">
+                                            <div class="text-info fs-4 fw-bold" id="totalDays">0</div>
+                                            <div class="text-muted small">Días trabajados</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6 text-center">
+                                        <div class="bg-dark p-3 rounded">
+                                            <div class="text-success fs-4 fw-bold" id="totalSessions">0</div>
+                                            <div class="text-muted small">Sesiones</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6 text-center">
+                                        <div class="bg-dark p-3 rounded">
+                                            <div class="text-warning fs-4 fw-bold" id="avgHours">0h</div>
+                                            <div class="text-muted small">Promedio/día</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Lista de sesiones -->
+                                <div class="table-responsive">
+                                    <table class="table table-dark table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Hora inicio</th>
+                                                <th>Hora fin</th>
+                                                <th>Duración</th>
+                                                <th>Descripción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="sessionsTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Botón de descarga -->
+                                <div class="text-center mt-4">
+                                    <button id="downloadPdfBtn" class="btn btn-success btn-lg px-5">
+                                        <i class="bi bi-download me-2"></i>Descargar PDF
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Estado de carga -->
+                            <div id="loadingState" class="text-center py-5 d-none">
+                                <div class="spinner-border text-primary mb-3" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                                <p class="text-muted">Generando reporte...</p>
+                            </div>
+
+                            <!-- Estado sin datos -->
+                            <div id="noDataState" class="text-center py-5 d-none">
+                                <div class="text-muted mb-3">
+                                    <i class="bi bi-calendar-x fs-1"></i>
+                                </div>
+                                <h5 class="text-muted">No hay datos para el período seleccionado</h5>
+                                <p class="text-muted">Selecciona un período diferente o registra algunas sesiones de trabajo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <site-footer></site-footer>
+
+    <!-- Scripts -->
+    <script src="./partials/NavBar.js"></script>
+    <script src="./partials/Footer.js"></script>
+    <script src="../public/js/download.js"></script>
 </body>
 
 </html>
