@@ -1,20 +1,24 @@
 <svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
   <defs>
+    <!-- Degradado estilo Discord -->
     <linearGradient id="timerGradient" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#5865F2"/>
       <stop offset="100%" stop-color="#404EED"/>
     </linearGradient>
   </defs>
 
-  <!-- Fondo oscuro neutro -->
-  <rect width="240" height="240" rx="48" fill="#1E1F22"/>
+  <!-- Fondo -->
+  <rect width="240" height="240" rx="48" fill="#36393F"/>
 
-  <!-- Círculo exterior del temporizador -->
-  <circle cx="120" cy="130" r="60" stroke="url(#timerGradient)" stroke-width="12" fill="none"/>
+  <!-- Cronómetro -->
+  <g transform="translate(40, 30)">
+    <!-- Botón superior del cronómetro (por encima del círculo) -->
+    <rect x="65" y="-5" width="30" height="12" rx="4" fill="url(#timerGradient)"/>
 
-  <!-- Marca de aguja o progreso -->
-  <line x1="120" y1="130" x2="120" y2="80" stroke="white" stroke-width="8" stroke-linecap="round"/>
+    <!-- Círculo principal -->
+    <circle cx="80" cy="90" r="72" stroke="url(#timerGradient)" stroke-width="12" fill="none"/>
 
-  <!-- Botón superior del temporizador -->
-  <rect x="105" y="50" width="30" height="12" rx="4" fill="url(#timerGradient)"/>
+    <!-- Aguja (amarillo Discord) -->
+    <line x1="80" y1="90" x2="80" y2="50" stroke="#FEE75C" stroke-width="8" stroke-linecap="round"/>
+  </g>
 </svg>
