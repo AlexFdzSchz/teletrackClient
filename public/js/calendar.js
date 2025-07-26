@@ -263,7 +263,7 @@ function createDayElement(day, year, month, isOtherMonth) {
 
     dayDiv.innerHTML = `
         <div class="day-number">${day}</div>
-        <div class="work-hours">${dayHours > 0 ? formatHours(dayHours) : ''}</div>
+        ${dayHours > 0 ? `<div class="work-hours">${formatHours(dayHours)}</div>` : ''}
     `;
 
     // Event listener para abrir modal

@@ -2,14 +2,17 @@
     height: 80px;
     border: 1px solid #495057;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+    border-radius: 4px;
+    background: rgba(54, 57, 63, 0.3);
 }
 
 .calendar-day:hover {
-    background-color: #495057 !important;
-    transform: scale(1.02);
+    background-color: rgba(79, 84, 92, 0.3) !important;
+    transform: scale(1.02) translateY(-1px);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
 }
 
 .calendar-day.other-month {
@@ -17,12 +20,85 @@
 }
 
 .calendar-day.today {
-    border: 2px solid #0d6efd;
-    box-shadow: 0 0 10px rgba(13, 110, 253, 0.3);
+    border: 2px solid #5865F2;
+    box-shadow: 
+        0 0 15px rgba(88, 101, 242, 0.4),
+        inset 0 0 10px rgba(88, 101, 242, 0.1);
+    position: relative;
+}
+
+.calendar-day.today::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border: 1px solid rgba(88, 101, 242, 0.3);
+    border-radius: 6px;
+    pointer-events: none;
+}
+
+.calendar-day.today.has-work {
+    border: 2px solid #5865F2;
+    box-shadow: 
+        0 0 15px rgba(88, 101, 242, 0.4),
+        inset 0 0 20px rgba(40, 167, 69, 0.1),
+        0 2px 10px rgba(40, 167, 69, 0.2);
+}
+
+.calendar-day.today.has-work:hover {
+    box-shadow: 
+        0 0 20px rgba(88, 101, 242, 0.6),
+        inset 0 0 25px rgba(40, 167, 69, 0.15),
+        0 5px 20px rgba(40, 167, 69, 0.4),
+        0 0 0 3px rgba(88, 101, 242, 0.2);
 }
 
 .calendar-day.has-work {
-    background-color: rgba(25, 135, 84, 0.2);
+    background: linear-gradient(135deg, 
+                    rgba(40, 167, 69, 0.2) 0%, 
+                    rgba(40, 167, 69, 0.15) 50%, 
+                    rgba(25, 135, 84, 0.25) 100%);
+    border: 2px solid rgba(40, 167, 69, 0.6);
+    box-shadow: 
+        inset 0 0 20px rgba(40, 167, 69, 0.1),
+        0 2px 10px rgba(40, 167, 69, 0.2);
+    position: relative;
+    overflow: visible;
+}
+
+.calendar-day.has-work::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, 
+                    rgba(40, 167, 69, 0.1) 0%, 
+                    rgba(25, 135, 84, 0.1) 100%);
+    border-radius: 8px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.calendar-day.has-work:hover {
+    background: linear-gradient(135deg, 
+                    rgba(40, 167, 69, 0.35) 0%, 
+                    rgba(40, 167, 69, 0.25) 50%, 
+                    rgba(25, 135, 84, 0.4) 100%) !important;
+    border-color: rgba(40, 167, 69, 0.8);
+    box-shadow: 
+        inset 0 0 25px rgba(40, 167, 69, 0.15),
+        0 5px 20px rgba(40, 167, 69, 0.4),
+        0 0 0 3px rgba(40, 167, 69, 0.1);
+    transform: scale(1.03) translateY(-2px);
+}
+
+.calendar-day.has-work:hover::before {
+    opacity: 1;
 }
 
 .day-number {
@@ -30,12 +106,63 @@
     font-weight: bold;
 }
 
-.work-hours {
-    font-size: 0.8rem;
-    color: #28a745;
-    font-weight: 500;
+/* Mejorar el número del día en días con trabajo */
+.calendar-day.has-work .day-number {
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    font-weight: 800;
 }
 
+.work-hours {
+    font-size: 0.75rem;
+    color: #ffffff;
+    font-weight: 700;
+    background: linear-gradient(135deg, 
+                    rgba(40, 167, 69, 0.9) 0%, 
+                    rgba(25, 135, 84, 0.95) 100%);
+    padding: 3px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+    box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    min-height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.work-hours::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+                    rgba(255, 255, 255, 0.1) 0%, 
+                    rgba(255, 255, 255, 0.05) 100%);
+    border-radius: 12px;
+    pointer-events: none;
+}
+
+.calendar-day.has-work:hover .work-hours {
+    background: linear-gradient(135deg, 
+                    rgba(40, 167, 69, 1) 0%, 
+                    rgba(25, 135, 84, 1) 100%);
+    box-shadow: 
+        0 3px 12px rgba(0, 0, 0, 0.4),
+        inset 0 1px 3px rgba(255, 255, 255, 0.3),
+        0 0 0 2px rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+}
+
+/* móviles */
 @media (max-width: 768px) {
     .calendar-day {
         height: 60px;
