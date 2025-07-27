@@ -11,16 +11,16 @@ class WorkSessionBar extends HTMLElement {
         <div class="container-fluid px-4">
           <div class="row align-items-center text-center">
             
-            <!-- Temporizador izquierda: ocupa 2 de 12 columnas en lg -->
-            <div class="col-12 col-lg-2 mb-3 mb-lg-0">
-              <div class="border border-primary rounded px-4 py-3 shadow-sm bg-dark mx-auto" style="max-width: 250px;">
+            <!-- Temporizador izquierda: ocupa 6 de 12 columnas en móvil, 2 de 12 en lg -->
+            <div class="col-6 col-lg-2 mb-3 mb-lg-0">
+              <div class="border border-primary rounded px-2 px-lg-4 py-2 py-lg-3 shadow-sm bg-dark mx-auto" style="max-width: 250px;">
                 <div class="text-white-50 small">Hora de comienzo</div>
-                <div id="startTime" class="fw-bold fs-2 text-primary shadow-sm">--:--:--</div>
+                <div id="startTime" class="fw-bold fs-4 fs-lg-2 text-primary shadow-sm">--:--:--</div>
               </div>
             </div>
             
-            <!-- Centro: input + botón, ocupa 8 de 12 columnas en lg -->
-            <div class="col-12 col-lg-8 d-flex flex-column align-items-center justify-content-center gap-3">
+            <!-- Centro: input + botón, ocupa 12 columnas en móvil, 8 en lg -->
+            <div class="col-12 col-lg-8 d-flex flex-column align-items-center justify-content-center gap-3 order-3 order-lg-2">
               <div class="position-relative w-100">
                 <input type="text"
                   id="sessionDescription"
@@ -36,11 +36,11 @@ class WorkSessionBar extends HTMLElement {
               </button>
             </div>
             
-            <!-- Temporizador derecha: ocupa 2 de 12 columnas en lg -->
-            <div class="col-12 col-lg-2 mt-3 mt-lg-0">
-              <div class="border border-primary rounded px-4 py-3 shadow-sm bg-dark mx-auto" style="max-width: 250px;">
+            <!-- Temporizador derecha: ocupa 6 de 12 columnas en móvil, 2 en lg -->
+            <div class="col-6 col-lg-2 mb-3 mb-lg-0 order-2 order-lg-3">
+              <div class="border border-primary rounded px-2 px-lg-4 py-2 py-lg-3 shadow-sm bg-dark mx-auto" style="max-width: 250px;">
                 <div class="text-white-50 small">Tiempo transcurrido</div>
-                <div id="elapsedTime" class="fw-bold fs-2 text-primary shadow-sm">00:00:00</div>
+                <div id="elapsedTime" class="fw-bold fs-4 fs-lg-2 text-primary shadow-sm">00:00:00</div>
               </div>
             </div>
             
