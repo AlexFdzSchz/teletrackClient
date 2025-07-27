@@ -68,6 +68,20 @@ class WorkSessionBar extends HTMLElement {
     this.toggleBtn.addEventListener('click', () => this.toggleSession());
     this.editDescBtn.addEventListener('click', () => this.editSessionDescription());
     
+    // Seleccionar todo el texto cuando se hace foco en el input de descripción
+    this.sessionDescInput.addEventListener('focus', () => {
+      this.sessionDescInput.select();
+    });
+    
+    // Guardar descripción con Enter si hay una sesión activa
+    this.sessionDescInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && this.activeSession) {
+        e.preventDefault(); // Evitar comportamiento por defecto
+        this.editSessionDescription();
+        this.sessionDescInput.blur(); // Quitar foco del input
+      }
+    });
+    
     // Comprobar si hay una sesión activa al cargar
     this.checkActiveSession();
   }
