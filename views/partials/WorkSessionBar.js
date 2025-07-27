@@ -15,7 +15,7 @@ class WorkSessionBar extends HTMLElement {
             <div class="col-6 col-lg-2 mb-3 mb-lg-0">
               <div class="border border-primary rounded px-2 px-lg-4 py-2 py-lg-3 shadow-sm bg-dark mx-auto" style="max-width: 250px;">
                 <div class="text-white-50 small">Hora de comienzo</div>
-                <div id="startTime" class="fw-bold fs-4 fs-lg-2 text-primary shadow-sm">--:--:--</div>
+                <div id="workSessionStartTime" class="fw-bold fs-4 fs-lg-2 text-primary shadow-sm">--:--:--</div>
               </div>
             </div>
             
@@ -60,7 +60,7 @@ class WorkSessionBar extends HTMLElement {
     // Referencias a elementos del DOM
     this.sessionDescInput = document.getElementById('sessionDescription');
     this.toggleBtn = document.getElementById('toggleSessionBtn');
-    this.startTimeDisplay = document.getElementById('startTime');
+    this.startTimeDisplay = document.getElementById('workSessionStartTime');
     this.elapsedDisplay = document.getElementById('elapsedTime');
     this.editDescBtn = document.getElementById('editDescriptionBtn');
 
@@ -184,8 +184,10 @@ class WorkSessionBar extends HTMLElement {
           startTime: new Date(sessionData.startTime).toLocaleString()
         });
         
+        // Usar la fecha del servidor para mantener consistencia
+        const serverStartTime = new Date(sessionData.startTime);
         this.updateUIForActiveSession();
-        this.startTimer(startTime);
+        this.startTimer(serverStartTime);
       } else {
         console.error('Error al crear sesión:', responseJson);
         alert(`Error: ${responseJson.message || 'No se pudo crear la sesión'}`);
@@ -244,6 +246,12 @@ class WorkSessionBar extends HTMLElement {
     
     this.stopTimer(); // Detener timer anterior si existe
     
+    // Asegurarse de que los elementos DOM existan antes de actualizarlos
+    if (!this.startTimeDisplay || !this.elapsedDisplay) {
+      console.error('Elementos DOM no encontrados');
+      return;
+    }
+    
     // Mostrar hora de inicio
     this.startTimeDisplay.textContent = this.formatTime(startTime);
     
@@ -252,6 +260,7 @@ class WorkSessionBar extends HTMLElement {
     this.elapsedDisplay.textContent = this.formatElapsedTime(initialElapsed);
     
     console.log(`Temporizador iniciado - Hora inicio: ${this.formatTime(startTime)}, Transcurrido inicial: ${this.formatElapsedTime(initialElapsed)}`);
+    console.log('Elemento startTimeDisplay:', this.startTimeDisplay, 'Texto mostrado:', this.startTimeDisplay.textContent);
     
     // Iniciar temporizador de tiempo transcurrido
     this.intervalId = setInterval(() => {
