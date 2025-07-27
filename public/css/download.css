@@ -333,3 +333,34 @@ main > .container {
     color: var(--bs-primary) !important;
     text-shadow: none;
 }
+
+/* Estilos para truncar texto largo en la tabla de sesiones */
+.session-description {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: help;
+    position: relative;
+}
+
+.session-description:hover {
+    overflow: visible;
+    white-space: normal;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 4px;
+    padding: 8px;
+    z-index: 1000;
+    position: absolute;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(88, 101, 242, 0.3);
+    max-width: 300px;
+    word-wrap: break-word;
+}
+
+/* Responsive: en móvil, hacer la descripción aún más pequeña */
+@media (max-width: 768px) {
+    .session-description {
+        max-width: 120px;
+    }
+}

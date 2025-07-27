@@ -320,6 +320,7 @@ function renderSessionsTable(sessions) {
     tbody.innerHTML = sortedSessions.map(session => {
         const start = new Date(session.startTime);
         const end = new Date(session.endTime);
+        const description = session.description || '-';
         
         return `
             <tr>
@@ -327,7 +328,7 @@ function renderSessionsTable(sessions) {
                 <td>${formatTime(start)}</td>
                 <td>${formatTime(end)}</td>
                 <td>${formatHours(session.duration)}</td>
-                <td>${session.description || '-'}</td>
+                <td class="session-description" title="${description}">${description}</td>
             </tr>
         `;
     }).join('');
