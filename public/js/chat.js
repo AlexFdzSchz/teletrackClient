@@ -116,14 +116,17 @@ async function loadUserGroups() {
 // Mostrar lista de grupos como chats
 function displayChatList() {
     const chatList = document.getElementById('chatList');
+    const chatListMobile = document.getElementById('chatListMobile');
     
     if (userGroups.length === 0) {
-        chatList.innerHTML = `
+        const emptyContent = `
             <div class="text-center py-3 empty-state">
                 <p>No perteneces a ningún grupo.</p>
                 <a href="./groups.html" class="btn btn-sm btn-primary">Ver grupos</a>
             </div>
         `;
+        chatList.innerHTML = emptyContent;
+        chatListMobile.innerHTML = emptyContent;
         return;
     }
     
@@ -147,7 +150,9 @@ function displayChatList() {
         `;
     });
     
+    // Actualizar ambas listas
     chatList.innerHTML = html;
+    chatListMobile.innerHTML = html;
 }
 
 // Seleccionar un chat y cargar mensajes
@@ -167,13 +172,21 @@ async function selectChat(groupId, groupName) {
         // Cargar mensajes del grupo
         await loadMessages(groupId);
         
-        // Resaltar chat activo
+        // Resaltar chat activo en ambas listas
         document.querySelectorAll('.chat-item').forEach(item => {
             item.classList.remove('active');
         });
-        const activeItem = document.querySelector(`[data-group-id="${groupId}"]`);
-        if (activeItem) {
-            activeItem.classList.add('active');
+        document.querySelectorAll(`[data-group-id="${groupId}"]`).forEach(item => {
+            item.classList.add('active');
+        });
+        
+        // Cerrar offcanvas en mobile
+        const offcanvasElement = document.getElementById('chatListOffcanvas');
+        if (offcanvasElement) {
+            const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
+            if (offcanvas) {
+                offcanvas.hide();
+            }
         }
         
         // Actualizar URL sin recargar la página

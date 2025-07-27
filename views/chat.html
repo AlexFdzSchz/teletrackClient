@@ -25,11 +25,31 @@
 
 <body class="bg-dark d-flex flex-column h-100">
     <nav-bar></nav-bar>
+    
+    <!-- Offcanvas para lista de chats - Mobile -->
+    <div class="offcanvas offcanvas-start bg-secondary text-light" tabindex="-1" id="chatListOffcanvas" aria-labelledby="chatListOffcanvasLabel">
+        <div class="offcanvas-header border-bottom border-dark">
+            <h5 class="offcanvas-title" id="chatListOffcanvasLabel">
+                <i class="bi bi-chat-dots me-2"></i>Conversaciones
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <div class="list-group list-group-flush" id="chatListMobile">
+                <!-- Las conversaciones se cargarán aquí (copia de chatList) -->
+                <div class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                    <p class="small mt-2 mb-0">Cargando chats...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <main class="py-4">
         <div class="container-fluid mt-3">
             <div class="row">
-                <!-- Sidebar de conversaciones -->
-                <div class="col-md-3 col-lg-3 col-xl-25">
+                <!-- Sidebar de conversaciones - Desktop -->
+                <div class="col-md-3 col-lg-3 col-xl-25 d-none d-md-block">
                     <div class="card bg-secondary text-light">
                         <div class="card-header">
                             <h5 class="mb-0">Conversaciones</h5>
@@ -47,11 +67,15 @@
                 </div>
 
                 <!-- Área principal del chat -->
-                <div class="col-md-9 col-lg-9 col-xl-75">
+                <div class="col-12 col-md-9 col-lg-9 col-xl-75">
                     <div class="card bg-secondary text-light">
                         <!-- Header del chat -->
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
+                                <!-- Botón para abrir offcanvas - Solo mobile -->
+                                <button class="btn btn-sm btn-primary me-3 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#chatListOffcanvas" aria-controls="chatListOffcanvas">
+                                    <i class="bi bi-list"></i>
+                                </button>
                                 <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                     <i class="bi bi-people-fill"></i>
                                 </div>
