@@ -575,10 +575,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 originalSettings = { ...currentSettings };
                 showAlert('Configuración de la interfaz actualizada correctamente', 'success');
                 
-                // Notificar al calendario si existe la función
-                if (typeof window.reloadCalendarSettings === 'function') {
-                    window.reloadCalendarSettings();
-                }
+
             } else {
                 const error = await response.json();
                 showAlert(error.message || 'Error al actualizar la configuración de la interfaz', 'danger');

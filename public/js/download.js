@@ -3,15 +3,53 @@
 let workSessions = [];
 let filteredSessions = [];
 let reportData = null;
+let userSettings = null; // Configuraciones del usuario
 
 // Inicializar la aplicación
 document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
-    loadWorkSessions().then(() => {
-        // Mostrar estado inicial sin datos en lugar de generar reporte automáticamente
-        showInitialState();
+    loadUserSettings().then(() => {
+        updatePeriodDescriptions(); // Actualizar descripciones según configuración
+        loadWorkSessions().then(() => {
+            // Mostrar estado inicial sin datos en lugar de generar reporte automáticamente
+            showInitialState();
+        });
     });
 });
+
+// Cargar configuraciones del usuario
+async function loadUserSettings() {
+    try {
+        const token = localStorage.getItem('authToken');
+        const response = await handleApiRequest(`${CONFIG.apiBaseUrl}/api/users/settings`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            userSettings = data.data || {};
+        } else {
+            console.warn('No se pudieron cargar las configuraciones del usuario');
+            userSettings = { calendarWeekStart: 'monday' }; // Valor por defecto
+        }
+    } catch (error) {
+        console.error('Error loading user settings:', error);
+        userSettings = { calendarWeekStart: 'monday' }; // Valor por defecto
+    }
+}
+
+// Función para recargar configuraciones cuando cambien
+function reloadUserSettings() {
+    loadUserSettings().then(() => {
+        updatePeriodDescriptions();
+    });
+}
+
+// Exponer función globalmente para que otras páginas puedan llamarla
+window.reloadDownloadSettings = reloadUserSettings;
 
 // Configurar event listeners
 function setupEventListeners() {
@@ -189,13 +227,22 @@ function getDateRange(period) {
 
     switch (period) {
         case 'thisWeek':
-            // Obtener lunes de la semana actual
+            // Calcular inicio de semana según configuración del usuario
             const dayOfWeek = today.getDay();
-            const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Ajustar para que lunes sea el primer día
-            start = new Date(today.setDate(diff));
+            let daysFromStart;
+            
+            if (userSettings && userSettings.calendarWeekStart === 'sunday') {
+                // Para empezar en domingo: domingo=0, lunes=1, martes=2, etc.
+                daysFromStart = dayOfWeek;
+            } else {
+                // Para empezar en lunes (por defecto): lunes=0, martes=1, ..., domingo=6
+                daysFromStart = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            }
+            
+            start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - daysFromStart);
             start.setHours(0, 0, 0, 0);
             
-            // Fin de semana (domingo)
+            // Fin de semana (6 días después del inicio)
             end = new Date(start);
             end.setDate(start.getDate() + 6);
             end.setHours(23, 59, 59, 999);
@@ -445,6 +492,20 @@ function downloadPDF() {
     } catch (error) {
         console.error('Error generando PDF:', error);
         alert('Error al generar el PDF. Por favor, intenta nuevamente.');
+    }
+}
+
+// Actualizar descripciones de período según configuración del usuario
+function updatePeriodDescriptions() {
+    if (!userSettings) return;
+    
+    const thisWeekDescription = document.querySelector('#thisWeek + label .period-description');
+    if (thisWeekDescription) {
+        if (userSettings.calendarWeekStart === 'sunday') {
+            thisWeekDescription.textContent = 'Domingo a sábado actual';
+        } else {
+            thisWeekDescription.textContent = 'Lunes a domingo actual';
+        }
     }
 }
 
