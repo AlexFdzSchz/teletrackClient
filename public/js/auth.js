@@ -158,12 +158,26 @@ async function logout() {
  */
 async function handleApiRequest(url, options = {}) {
     try {
+        // Verificar si la petición incluye un token de autorización
+        const hasAuthToken = options.headers && options.headers['Authorization'];
+        const localToken = localStorage.getItem('authToken');
+        
+        // Si no hay token local y se intenta hacer una petición autenticada, redirigir silenciosamente
+        if (!localToken && hasAuthToken) {
+            console.warn('No hay token de autenticación local. Redirigiendo a login.');
+            redirectToLogin(); // Sin mensaje de error
+            // Crear una respuesta falsa con status 401 para mantener compatibilidad
+            return new Response(null, { status: 401 });
+        }
+        
         const response = await fetch(url, options);
         
         // Si la respuesta es 401 Unauthorized, el token ha expirado
         if (response.status === 401) {
             console.warn('Sesión expirada o token inválido. Cerrando sesión...');
-            redirectToLogin('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.', 'session_expired');
+            // Solo mostrar mensaje si había un token (sesión que expiró)
+            const message = localToken ? 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.' : '';
+            redirectToLogin(message, 'session_expired');
             return response; 
         }
         
@@ -185,6 +199,15 @@ async function handleApiRequest(url, options = {}) {
     } catch (error) {
         console.error('Error en petición a la API:', error);
         
+        // Verificar si hay token local - si no hay, es probablemente un usuario no autenticado
+        const localToken = localStorage.getItem('authToken');
+        if (!localToken) {
+            console.warn('Error en petición sin token de autenticación. Redirigiendo a login silenciosamente.');
+            redirectToLogin(); 
+            throw error;
+        }
+        
+        // Si hay token, entonces sí es un error de conectividad real
         // Verificar si es un error de conectividad
         if (error.name === 'TypeError' && error.message.includes('fetch')) {
             redirectToLogin('No se puede conectar con el servidor. Verifica tu conexión a internet.', 'network_error');
