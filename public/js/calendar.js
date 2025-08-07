@@ -4,6 +4,7 @@ let currentDate = new Date();
 let workSessions = []; // Inicializar como array vacío
 let selectedDateForModal = null;
 let editingSessionId = null;
+let userSettings = null; // Configuraciones del usuario
 
 // Inicializar la aplicación
 document.addEventListener('DOMContentLoaded', function() {
@@ -12,10 +13,45 @@ document.addEventListener('DOMContentLoaded', function() {
         workSessions = [];
     }
     
+    loadUserSettings();
     loadWorkSessions();
-    generateCalendar();
     setupEventListeners();
 });
+
+// Cargar configuraciones del usuario
+async function loadUserSettings() {
+    try {
+        const token = localStorage.getItem('authToken');
+        const response = await handleApiRequest(`${CONFIG.apiBaseUrl}/api/users/settings`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            userSettings = data.data || {};
+        } else {
+            console.warn('No se pudieron cargar las configuraciones del usuario');
+            userSettings = { calendarWeekStart: 'monday' }; // Valor por defecto
+        }
+    } catch (error) {
+        console.error('Error loading user settings:', error);
+        userSettings = { calendarWeekStart: 'monday' }; // Valor por defecto
+    }
+    
+    // Generar calendario después de cargar configuraciones
+    generateCalendar();
+}
+
+// Función para recargar configuraciones cuando cambien
+function reloadUserSettings() {
+    loadUserSettings();
+}
+
+// Exponer función globalmente para que otras páginas puedan llamarla
+window.reloadCalendarSettings = reloadUserSettings;
 
 // Configurar event listeners
 function setupEventListeners() {
@@ -86,6 +122,21 @@ function setupDateTimeListeners() {
     });
 }
 
+// Función helper para formatear fecha para input date (evita problemas de zona horaria)
+function formatDateForInput(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// Función helper para formatear hora para input time
+function formatTimeForInput(date) {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+}
+
 // Cargar sesiones de trabajo desde la API
 async function loadWorkSessions() {
     try {
@@ -132,6 +183,11 @@ async function loadWorkSessions() {
 
 // Generar el calendario
 function generateCalendar() {
+    // Si no hay configuraciones cargadas aún, esperar
+    if (!userSettings) {
+        return;
+    }
+    
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     
@@ -142,14 +198,23 @@ function generateCalendar() {
             year: 'numeric' 
         });
 
+    // Actualizar encabezados de días de la semana según configuración
+    updateWeekHeaders();
+
     // Obtener primer día del mes y último día
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     
-    // Ajustar para que las semanas empiecen por lunes (0=domingo, 1=lunes, etc.)
-    // Convertir: domingo=0 -> 6, lunes=1 -> 0, martes=2 -> 1, etc.
+    // Ajustar el primer día según configuración del usuario
     let firstDayWeek = firstDay.getDay();
-    firstDayWeek = (firstDayWeek === 0) ? 6 : firstDayWeek - 1;
+    
+    if (userSettings.calendarWeekStart === 'monday') {
+        // Para empezar en lunes: domingo=0 -> 6, lunes=1 -> 0, etc.
+        firstDayWeek = (firstDayWeek === 0) ? 6 : firstDayWeek - 1;
+    } else {
+        // Para empezar en domingo: mantener como está (domingo=0, lunes=1, etc.)
+        // firstDayWeek ya está correcto
+    }
     
     const daysInMonth = lastDay.getDate();
 
@@ -269,7 +334,7 @@ function createDayElement(day, year, month, isOtherMonth) {
     // Event listener para abrir modal
     if (!isOtherMonth) {
         dayDiv.addEventListener('click', () => {
-            selectedDateForModal = dateObj;
+            selectedDateForModal = formatDateForInput(dateObj); // Guardar como string YYYY-MM-DD
             showDaySessionsModal(dateObj);
         });
     }
@@ -488,14 +553,14 @@ function openSessionModal(session = null) {
         
         // Procesar fecha y hora de inicio
         const startDateTime = new Date(session.startTime);
-        document.getElementById('startDate').value = startDateTime.toISOString().split('T')[0];
-        document.getElementById('startTime').value = startDateTime.toTimeString().slice(0, 5);
+        document.getElementById('startDate').value = formatDateForInput(startDateTime);
+        document.getElementById('startTime').value = formatTimeForInput(startDateTime);
         
         // Procesar fecha y hora de fin si existe
         if (session.endTime) {
             const endDateTime = new Date(session.endTime);
-            document.getElementById('endDate').value = endDateTime.toISOString().split('T')[0];
-            document.getElementById('endTime').value = endDateTime.toTimeString().slice(0, 5);
+            document.getElementById('endDate').value = formatDateForInput(endDateTime);
+            document.getElementById('endTime').value = formatTimeForInput(endDateTime);
         } else {
             document.getElementById('endDate').value = '';
             document.getElementById('endTime').value = '';
@@ -511,19 +576,21 @@ function openSessionModal(session = null) {
         let defaultDate;
         
         if (selectedDateForModal) {
-            defaultDate = new Date(selectedDateForModal);
+            // selectedDateForModal ya está en formato YYYY-MM-DD
+            const [year, month, day] = selectedDateForModal.split('-');
+            defaultDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
         } else {
             defaultDate = now;
         }
         
-        // Configurar fecha de inicio
-        document.getElementById('startDate').value = defaultDate.toISOString().split('T')[0];
-        document.getElementById('startTime').value = now.toTimeString().slice(0, 5);
+        // Configurar fecha de inicio usando la función helper
+        document.getElementById('startDate').value = formatDateForInput(defaultDate);
+        document.getElementById('startTime').value = formatTimeForInput(now);
         
         // Configurar hora de fin por defecto (1 hora después del inicio)
         const defaultEndTime = new Date(now.getTime() + 60 * 60 * 1000); // +1 hora
-        document.getElementById('endDate').value = defaultDate.toISOString().split('T')[0]; // Misma fecha que inicio
-        document.getElementById('endTime').value = defaultEndTime.toTimeString().slice(0, 5);
+        document.getElementById('endDate').value = formatDateForInput(defaultDate); // Misma fecha que inicio
+        document.getElementById('endTime').value = formatTimeForInput(defaultEndTime);
         
         document.getElementById('description').value = '';
         document.getElementById('deleteSessionBtn').style.display = 'none';
@@ -635,12 +702,23 @@ async function saveSession(e) {
             setTimeout(async () => {
                 await loadWorkSessions();
                 
-                // Solo reabrir el modal del día si tenemos una fecha seleccionada
-                if (selectedDateForModal) {
-                    // Esperar un poco más para asegurar que el modal anterior se cerró completamente
+                // Si estamos editando una sesión existente, reabrir el modal del día
+                // Si estamos creando una nueva sesión, cerrar ambos modales, asi no tenemos que actualizar el modal del día por vagancia
+                if (editingSessionId && selectedDateForModal) {
+                    // Solo reabrir el modal del día si estamos editando una sesión existente
                     setTimeout(() => {
-                        showDaySessionsModal(selectedDateForModal);
+                        const [year, month, day] = selectedDateForModal.split('-');
+                        const dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                        showDaySessionsModal(dateObj);
                     }, 100);
+                } else {
+                    // Si estamos creando una nueva sesión, cerrar también el modal del día
+                    const daySessionsModal = bootstrap.Modal.getInstance(document.getElementById('daySessionsModal'));
+                    if (daySessionsModal) {
+                        daySessionsModal.hide();
+                    }
+                    // Limpiar la fecha seleccionada
+                    selectedDateForModal = null;
                 }
             }, 300);
         } else {
@@ -688,11 +766,12 @@ async function deleteSession() {
             setTimeout(async () => {
                 await loadWorkSessions();
                 
-                // Solo reabrir el modal del día si tenemos una fecha seleccionada
+                // Al eliminar una sesión, siempre reabrir el modal del día para mostrar el estado actualizado
                 if (selectedDateForModal) {
-                    // Esperar un poco más para asegurar que el modal anterior se cerró completamente
                     setTimeout(() => {
-                        showDaySessionsModal(selectedDateForModal);
+                        const [year, month, day] = selectedDateForModal.split('-');
+                        const dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                        showDaySessionsModal(dateObj);
                     }, 100);
                 }
             }, 300);
@@ -759,6 +838,28 @@ function updateStatistics() {
     document.getElementById('workDaysMonth').textContent = workDays;
     document.getElementById('avgHoursDay').textContent = formatHours(avgHours);
     document.getElementById('totalSessions').textContent = monthSessions.length;
+}
+
+// Actualizar encabezados de días de la semana
+function updateWeekHeaders() {
+    const weekDaysContainer = document.querySelector('.row.mb-2');
+    if (!weekDaysContainer) return;
+    
+    let dayHeaders;
+    
+    if (userSettings.calendarWeekStart === 'sunday') {
+        dayHeaders = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    } else {
+        dayHeaders = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    }
+    
+    // Actualizar los encabezados
+    const headerCols = weekDaysContainer.querySelectorAll('.col');
+    headerCols.forEach((col, index) => {
+        if (dayHeaders[index]) {
+            col.textContent = dayHeaders[index];
+        }
+    });
 }
 
 // Función para limpiar backdrops de modales que puedan quedar colgando
