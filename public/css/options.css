@@ -1,0 +1,226 @@
+/* Estilos específicos para la página de opciones */
+
+/* Navegación lateral */
+.list-group-item-action:hover {
+    background-color: var(--bs-dark) !important;
+    transition: background-color 0.3s ease;
+}
+
+.list-group-item-action.active {
+    background-color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+}
+
+/* Secciones de configuración */
+.settings-section {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Formularios */
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(88, 101, 242, 0.25);
+}
+
+.form-control[readonly] {
+    background-color: var(--bs-secondary) !important;
+    opacity: 0.7;
+}
+
+/* Avatar */
+#avatarPreview {
+    border: 3px solid var(--bs-primary);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+#avatarPreview:hover {
+    transform: scale(1.05);
+    border-color: var(--bs-info);
+}
+
+#avatarPreview.uploading {
+    opacity: 0.7;
+}
+
+#avatarPreview.uploading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid var(--bs-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.object-fit-cover {
+    object-fit: cover;
+}
+
+/* Animación suave para cambio de imagen */
+#currentAvatar {
+    transition: opacity 0.3s ease;
+}
+
+/* Validación de contraseña */
+.form-text {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Barra de progreso personalizada */
+.progress {
+    height: 8px;
+    background-color: var(--bs-dark);
+}
+
+.progress-bar {
+    background-color: var(--bs-primary);
+    transition: width 0.3s ease;
+}
+
+/* Alertas personalizadas */
+.alert {
+    border: none;
+    border-radius: 8px;
+}
+
+.alert-success {
+    background-color: rgba(40, 167, 69, 0.15);
+    color: var(--bs-success);
+    border-left: 4px solid var(--bs-success);
+}
+
+.alert-danger {
+    background-color: rgba(237, 66, 69, 0.15);
+    color: var(--bs-danger);
+    border-left: 4px solid var(--bs-danger);
+}
+
+.alert-info {
+    background-color: rgba(88, 101, 242, 0.15);
+    color: var(--bs-info);
+    border-left: 4px solid var(--bs-info);
+}
+
+.alert-warning {
+    background-color: rgba(254, 231, 92, 0.15);
+    color: var(--bs-warning);
+    border-left: 4px solid var(--bs-warning);
+}
+
+/* Opciones de calendario */
+.calendar-option {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.calendar-option:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.calendar-option.border-primary {
+    border-color: var(--bs-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(88, 101, 242, 0.25);
+}
+
+.calendar-option .form-check-input:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+/* Botones con efectos */
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Tarjetas */
+.card {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 20px rgba(88, 101, 242, 0.1);
+}
+
+/* Input groups */
+.input-group .btn {
+    border-color: var(--bs-primary);
+}
+
+.input-group .btn:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    #avatarPreview {
+        width: 120px !important;
+        height: 120px !important;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn {
+        font-size: 0.875rem;
+    }
+}
+
+/* Mejoras para accesibilidad */
+.form-control:focus,
+.btn:focus {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 2px;
+}
+
+/* Animaciones suaves */
+* {
+    transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Estados de carga */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Tooltips personalizados */
+[data-bs-toggle="tooltip"] {
+    cursor: help;
+}

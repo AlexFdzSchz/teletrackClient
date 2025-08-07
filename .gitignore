@@ -1,7 +1,3 @@
 api.md
 node_modules
-# Ignorar mockups temporales
-views/options.html
-views/home.html
-views/sessions.html
 README.md

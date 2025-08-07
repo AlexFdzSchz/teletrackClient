@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleTrack - Opciones</title>
+    <link rel="icon" type="image/svg+xml" href="../public/img/teletrack-icon.svg">
+    <link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../public/css/teletrack-theme.css" rel="stylesheet">
+    <link href="../public/css/work-session-bar.css" rel="stylesheet">
+    <link href="../public/css/options.css" rel="stylesheet">
+    <script src="../config.js"></script>
+    <script src="../public/js/auth.js"></script>
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../public/js/options.js"></script>
+</head>
+
+<body class="bg-dark d-flex flex-column h-100">
+    <nav-bar></nav-bar>
+    <main class="flex-grow-1 py-4">
+        <div class="container mt-4">
+            <!-- Contenedor de alertas para notificaciones -->
+            <div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;" id="alertContainer">
+                <!-- Las alertas se insertarán aquí dinámicamente -->
+            </div>
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="text-light">
+                    <i class="bi bi-gear-fill me-2"></i>Opciones
+                </h1>
+            </div>
+
+            <div class="row">
+                <!-- Sidebar de navegación -->
+                <div class="col-lg-3 col-md-4 mb-4">
+                    <div class="card bg-secondary text-light">
+                        <div class="card-header">
+                            <h6 class="mb-0">Configuración</h6>
+                        </div>
+                        <div class="list-group list-group-flush">
+                            <button class="list-group-item list-group-item-action bg-secondary text-light border-dark active" data-section="profile">
+                                <i class="bi bi-person-fill me-2"></i>Perfil
+                            </button>
+                            <button class="list-group-item list-group-item-action bg-secondary text-light border-dark" data-section="interface">
+                                <i class="bi bi-palette-fill me-2"></i>Interfaz
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contenido principal -->
+                <div class="col-lg-9 col-md-8">
+                    
+                    <!-- Sección de Perfil -->
+                    <div class="settings-section" id="profile-section">
+                        <!-- Información Personal -->
+                        <div class="card bg-secondary text-light mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-person-fill me-2"></i>Información Personal
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <!-- Foto de perfil -->
+                                    <div class="col-md-3 text-center mb-4">
+                                        <div class="position-relative d-inline-block">
+                                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto" 
+                                                 style="width: 120px; height: 120px; overflow: hidden;" id="avatarPreview">
+                                                <img id="currentAvatar" class="w-100 h-100 object-fit-cover d-none" alt="Avatar actual">
+                                                <div id="avatarPlaceholder" class="text-center">
+                                                    <i class="bi bi-person-fill" style="font-size: 3rem;"></i>
+                                                    <div class="mt-1 small">Sin foto</div>
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-sm btn-primary position-absolute bottom-0 end-0 rounded-circle" 
+                                                    style="width: 32px; height: 32px;" id="changeAvatarBtn">
+                                                <i class="bi bi-camera-fill"></i>
+                                            </button>
+                                        </div>
+                                        <div class="mt-3">
+                                            <input type="file" class="form-control bg-dark text-light border-primary d-none" 
+                                                   id="avatarInput" accept="image/*">
+                                            <button type="button" class="btn btn-outline-primary btn-sm me-1" id="selectFileBtn">
+                                                <i class="bi bi-folder2-open me-1"></i>Cambiar
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger btn-sm" id="removeAvatarBtn">
+                                                <i class="bi bi-trash me-1"></i>Eliminar
+                                            </button>
+                                        </div>
+                                        <div id="uploadProgress" class="d-none mt-2">
+                                            <div class="progress mb-2" style="height: 6px;">
+                                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                            </div>
+                                            <small class="text-muted">Subiendo imagen...</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Formulario de datos -->
+                                    <div class="col-md-9">
+                                        <form id="profileForm">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="firstName" class="form-label text-light">Nombre</label>
+                                                    <input type="text" class="form-control bg-dark text-light border-primary" id="firstName" required>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="lastName" class="form-label text-light">Apellidos</label>
+                                                    <input type="text" class="form-control bg-dark text-light border-primary" id="lastName">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="nickname" class="form-label text-light">Apodo</label>
+                                                    <input type="text" class="form-control bg-dark text-light border-primary" id="nickname" readonly>
+                                                    <div class="form-text text-muted">El apodo no se puede modificar</div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="email" class="form-label text-light">Correo electrónico</label>
+                                                    <input type="email" class="form-control bg-dark text-light border-primary" id="email" readonly>
+                                                    <div class="form-text text-muted">El email no se puede modificar</div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="address" class="form-label text-light">Dirección</label>
+                                                    <input type="text" class="form-control bg-dark text-light border-primary" id="address" placeholder="Calle, número, piso...">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="city" class="form-label text-light">Ciudad</label>
+                                                    <input type="text" class="form-control bg-dark text-light border-primary" id="city" placeholder="Ciudad">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="postalCode" class="form-label text-light">Código Postal</label>
+                                                    <input type="text" class="form-control bg-dark text-light border-primary" id="postalCode" placeholder="00000">
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="province" class="form-label text-light">Provincia</label>
+                                                    <input type="text" class="form-control bg-dark text-light border-primary" id="province" placeholder="Provincia">
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="country" class="form-label text-light">País</label>
+                                                    <input type="text" class="form-control bg-dark text-light border-primary" id="country" placeholder="País">
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-end">
+                                                <button type="button" class="btn btn-outline-secondary me-2" id="resetProfileBtn">
+                                                    <i class="bi bi-arrow-clockwise me-1"></i>Deshacer
+                                                </button>
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="bi bi-check-lg me-1"></i>Guardar Cambios
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cambiar Contraseña -->
+                        <div class="card bg-secondary text-light">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-shield-lock-fill me-2"></i>Cambiar Contraseña
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    La contraseña debe tener al menos 8 caracteres e incluir una letra mayúscula, una minúscula y un número.
+                                </div>
+                                <form id="passwordForm">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="currentPassword" class="form-label text-light">Contraseña Actual</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control bg-dark text-light border-primary" id="currentPassword" required>
+                                                <button class="btn btn-outline-primary" type="button" id="toggleCurrentPassword">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="newPassword" class="form-label text-light">Nueva Contraseña</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control bg-dark text-light border-primary" id="newPassword" required>
+                                                <button class="btn btn-outline-primary" type="button" id="toggleNewPassword">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div class="form-text" id="passwordStrength"></div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="confirmPassword" class="form-label text-light">Confirmar Contraseña</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control bg-dark text-light border-primary" id="confirmPassword" required>
+                                                <button class="btn btn-outline-primary" type="button" id="toggleConfirmPassword">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div class="form-text" id="passwordMatch"></div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-outline-secondary me-2" id="clearPasswordForm">
+                                            <i class="bi bi-x-lg me-1"></i>Limpiar
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-shield-check me-1"></i>Cambiar Contraseña
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección de Interfaz -->
+                    <div class="settings-section d-none" id="interface-section">
+                        <div class="card bg-secondary text-light">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-palette-fill me-2"></i>Configuración de Interfaz
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="interfaceForm">
+                                    <div class="mb-4">
+                                        <label for="calendarWeekStart" class="form-label text-light fw-bold">
+                                            <i class="bi bi-calendar-week me-2"></i>Inicio de Semana del Calendario
+                                        </label>
+                                        <div class="form-text text-muted mb-3">
+                                            Selecciona qué día debe aparecer como primer día de la semana en el calendario
+                                        </div>
+                                        <select class="form-select bg-dark text-light border-primary" id="calendarWeekStart" name="calendarWeekStart">
+                                            <option value="monday">Lunes (Lun | Mar | Mié | Jue | Vie | Sáb | Dom)</option>
+                                            <option value="sunday">Domingo (Dom | Lun | Mar | Mié | Jue | Vie | Sáb)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-outline-secondary me-2" id="resetInterfaceBtn">
+                                            <i class="bi bi-arrow-clockwise me-1"></i>Deshacer
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check-lg me-1"></i>Guardar Cambios
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <work-session-bar></work-session-bar>
+    <site-footer></site-footer>
+    
+    <script type="module" src="./partials/NavBar.js"></script>
+    <script type="module" src="./partials/Footer.js"></script>
+    <script type="module" src="./partials/WorkSessionBar.js"></script>
+
+</body>
+
+</html>
