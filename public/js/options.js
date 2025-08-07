@@ -450,6 +450,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                     showSuccessAlert('Foto de perfil actualizada correctamente');
                     // Usar la función principal para mostrar el avatar actualizado
                     loadUserAvatar();
+                    // Disparar evento para actualizar la navbar
+                    document.dispatchEvent(new CustomEvent('avatarUpdated'));
                 }, 1000);
                 
             } else if (response.status === 401) {
@@ -507,6 +509,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 loadUserAvatar();
                 
                 showSuccessAlert('Foto de perfil eliminada correctamente');
+                // Disparar evento para actualizar la navbar
+                document.dispatchEvent(new CustomEvent('avatarUpdated'));
             } else {
                 const error = await response.json();
                 showErrorAlert(error.message || 'Error al eliminar la foto de perfil');
