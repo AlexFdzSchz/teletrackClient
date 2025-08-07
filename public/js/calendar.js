@@ -893,3 +893,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Exponer funciones globalmente para que otros componentes puedan usarlas (necesario para que la worksessionbar pueda actualizar el calendario)
+window.reloadCalendarSettings = reloadUserSettings;
+window.loadWorkSessions = loadWorkSessions;
+window.reloadCalendarData = function() {
+    loadUserSettings();
+    loadWorkSessions();
+};

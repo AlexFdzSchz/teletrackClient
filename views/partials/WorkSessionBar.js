@@ -202,6 +202,18 @@ class WorkSessionBar extends HTMLElement {
         const serverStartTime = new Date(sessionData.startTime);
         this.updateUIForActiveSession();
         this.startTimer(serverStartTime);
+        
+        // Notificar al calendario si existe la función para recargar sesiones
+        if (typeof window.loadWorkSessions === 'function') {
+          console.log('Actualizando calendario después de iniciar sesión...');
+          window.loadWorkSessions();
+        }
+        
+        // También notificar si hay una función de recarga más general del calendario
+        if (typeof window.reloadCalendarData === 'function') {
+          console.log('Recargando datos del calendario...');
+          window.reloadCalendarData();
+        }
       } else {
         console.error('Error al crear sesión:', responseJson);
         alert(`Error: ${responseJson.message || 'No se pudo crear la sesión'}`);
@@ -242,6 +254,18 @@ class WorkSessionBar extends HTMLElement {
         this.updateUIForInactiveSession();
         this.activeSession = null;
         this.stopTimer();
+        
+        // Notificar al calendario si existe la función para recargar sesiones
+        if (typeof window.loadWorkSessions === 'function') {
+          console.log('Actualizando calendario después de finalizar sesión...');
+          window.loadWorkSessions();
+        }
+        
+        // También notificar si hay una función de recarga más general del calendario
+        if (typeof window.reloadCalendarData === 'function') {
+          console.log('Recargando datos del calendario...');
+          window.reloadCalendarData();
+        }
       } else {
         console.error('Error al finalizar sesión:', data);
       }
