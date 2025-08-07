@@ -46,11 +46,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                 populateProfileForm();
                 loadUserAvatar();
             } else {
-                showAlert('Error al cargar los datos del usuario', 'danger');
+                showErrorAlert('Error al cargar los datos del usuario');
             }
         } catch (error) {
             console.error('Error loading user data:', error);
-            showAlert('Error de conexión al cargar los datos', 'danger');
+            showErrorAlert('Error de conexión al cargar los datos');
         }
     }
 
@@ -202,21 +202,21 @@ document.addEventListener('DOMContentLoaded', async function () {
                 const data = await response.json();
                 currentUserData = { ...currentUserData, ...formData };
                 originalUserData = { ...currentUserData };
-                showAlert('Perfil actualizado correctamente', 'success');
+                showSuccessAlert('Perfil actualizado correctamente');
             } else {
                 const error = await response.json();
-                showAlert(error.message || 'Error al actualizar el perfil', 'danger');
+                showErrorAlert(error.message || 'Error al actualizar el perfil');
             }
         } catch (error) {
             console.error('Error updating profile:', error);
-            showAlert('Error de conexión al actualizar el perfil', 'danger');
+            showErrorAlert('Error de conexión al actualizar el perfil');
         }
     }
 
     // Resetear formulario de perfil
     function resetProfileForm() {
         populateProfileForm();
-        showAlert('Cambios descartados', 'info');
+        showInfoAlert('Cambios descartados');
     }
 
     // Manejar envío del formulario de contraseña
@@ -228,12 +228,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         const confirmPassword = document.getElementById('confirmPassword').value;
 
         if (newPassword !== confirmPassword) {
-            showAlert('Las contraseñas no coinciden', 'danger');
+            showErrorAlert('Las contraseñas no coinciden');
             return;
         }
 
         if (!validatePasswordStrength(newPassword)) {
-            showAlert('La contraseña no cumple con los requisitos mínimos', 'danger');
+            showErrorAlert('La contraseña no cumple con los requisitos mínimos');
             return;
         }
 
@@ -254,14 +254,14 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (response.ok) {
                 passwordForm.reset();
                 clearPasswordValidation();
-                showAlert('Contraseña cambiada correctamente', 'success');
+                showSuccessAlert('Contraseña cambiada correctamente');
             } else {
                 const error = await response.json();
-                showAlert(error.message || 'Error al cambiar la contraseña', 'danger');
+                showErrorAlert(error.message || 'Error al cambiar la contraseña');
             }
         } catch (error) {
             console.error('Error changing password:', error);
-            showAlert('Error de conexión al cambiar la contraseña', 'danger');
+            showErrorAlert('Error de conexión al cambiar la contraseña');
         }
     }
 
@@ -355,12 +355,12 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // Validar archivo
         if (!file.type.startsWith('image/')) {
-            showAlert('Por favor selecciona un archivo de imagen válido', 'danger');
+            showErrorAlert('Por favor selecciona un archivo de imagen válido');
             return;
         }
 
         if (file.size > 5 * 1024 * 1024) { // 5MB
-            showAlert('El archivo es demasiado grande. Máximo 5MB', 'danger');
+            showErrorAlert('El archivo es demasiado grande. Máximo 5MB');
             return;
         }
 
@@ -389,7 +389,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             // Debug: verificar que tenemos un token válido
             if (!token) {
                 hideUploadProgress();
-                showAlert('No se encontró token de autenticación. Por favor, inicia sesión nuevamente.', 'danger');
+                showErrorAlert('No se encontró token de autenticación. Por favor, inicia sesión nuevamente.');
                 loadUserAvatar();
                 return;
             }
@@ -411,7 +411,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             
             if (testResponse.status === 401) {
                 hideUploadProgress();
-                showAlert('Token de autenticación inválido. Por favor, inicia sesión nuevamente.', 'danger');
+                showErrorAlert('Token de autenticación inválido. Por favor, inicia sesión nuevamente.');
                 loadUserAvatar();
                 setTimeout(() => {
                     window.location.href = './login.html';
@@ -447,14 +447,14 @@ document.addEventListener('DOMContentLoaded', async function () {
                 // Actualizar la UI después de un breve delay para mejor UX
                 setTimeout(() => {
                     hideUploadProgress();
-                    showAlert('Foto de perfil actualizada correctamente', 'success');
+                    showSuccessAlert('Foto de perfil actualizada correctamente');
                     // Usar la función principal para mostrar el avatar actualizado
                     loadUserAvatar();
                 }, 1000);
                 
             } else if (response.status === 401) {
                 hideUploadProgress();
-                showAlert('Sesión expirada. Por favor, inicia sesión nuevamente.', 'danger');
+                showErrorAlert('Sesión expirada. Por favor, inicia sesión nuevamente.');
                 // Revertir preview en caso de error
                 loadUserAvatar();
                 // Redirigir al login después de un breve delay
@@ -466,11 +466,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                     // Intentar parsear como JSON si no hemos leído el cuerpo aún
                     const error = await response.json();
                     hideUploadProgress();
-                    showAlert(error.message || 'Error al subir la imagen', 'danger');
+                    showErrorAlert(error.message || 'Error al subir la imagen');
                 } catch (jsonError) {
                     // Si no es JSON válido, usar el texto que ya leímos
                     hideUploadProgress();
-                    showAlert('Error al subir la imagen: ' + response.statusText, 'danger');
+                    showErrorAlert('Error al subir la imagen: ' + response.statusText);
                 }
                 // Revertir preview en caso de error
                 loadUserAvatar();
@@ -478,7 +478,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         } catch (error) {
             console.error('Error uploading avatar:', error);
             hideUploadProgress();
-            showAlert('Error al subir la imagen', 'danger');
+            showErrorAlert('Error al subir la imagen');
             // Revertir preview en caso de error
             loadUserAvatar();
         }
@@ -506,14 +506,14 @@ document.addEventListener('DOMContentLoaded', async function () {
                 // Actualizar UI usando la función principal
                 loadUserAvatar();
                 
-                showAlert('Foto de perfil eliminada correctamente', 'success');
+                showSuccessAlert('Foto de perfil eliminada correctamente');
             } else {
                 const error = await response.json();
-                showAlert(error.message || 'Error al eliminar la foto de perfil', 'danger');
+                showErrorAlert(error.message || 'Error al eliminar la foto de perfil');
             }
         } catch (error) {
             console.error('Error removing avatar:', error);
-            showAlert('Error de conexión al eliminar la foto de perfil', 'danger');
+            showErrorAlert('Error de conexión al eliminar la foto de perfil');
         }
     }
 
@@ -573,58 +573,109 @@ document.addEventListener('DOMContentLoaded', async function () {
                 const data = await response.json();
                 currentSettings = { ...currentSettings, ...settingsData };
                 originalSettings = { ...currentSettings };
-                showAlert('Configuración de la interfaz actualizada correctamente', 'success');
+                showSuccessAlert('Configuración de la interfaz actualizada correctamente');
                 
 
             } else {
                 const error = await response.json();
-                showAlert(error.message || 'Error al actualizar la configuración de la interfaz', 'danger');
+                showErrorAlert(error.message || 'Error al actualizar la configuración de la interfaz');
             }
         } catch (error) {
             console.error('Error updating interface settings:', error);
-            showAlert('Error de conexión al actualizar la configuración de la interfaz', 'danger');
+            showErrorAlert('Error de conexión al actualizar la configuración de la interfaz');
         }
     }
 
     // Resetear formulario de interfaz
     function resetInterfaceForm() {
         populateInterfaceForm();
-        showAlert('Cambios descartados', 'info');
+        showInfoAlert('Cambios descartados');
     }
 
-    // Mostrar alertas
-    function showAlert(message, type = 'info') {
-        const alertContainer = document.getElementById('alertContainer');
+    // Mostrar alerta de error con Bootstrap Alert (igual que groups.html)
+    function showErrorAlert(message) {
         const alertId = 'alert-' + Date.now();
-        
-        const alertHTML = `
-            <div class="alert alert-${type} alert-dismissible fade show" role="alert" id="${alertId}">
-                <i class="bi bi-${getAlertIcon(type)} me-2"></i>
-                ${message}
+        const alertHtml = `
+            <div id="${alertId}" class="alert alert-danger alert-dismissible fade show mb-0" role="alert">
+                <strong><i class="bi bi-exclamation-circle-fill me-2"></i>Error:</strong> ${message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         `;
         
-        alertContainer.insertAdjacentHTML('beforeend', alertHTML);
+        const container = document.getElementById('alertContainer');
+        container.insertAdjacentHTML('beforeend', alertHtml);
         
-        // Auto-remove after 5 seconds
+        // Programar eliminación automática después de 5 segundos
         setTimeout(() => {
-            const alert = document.getElementById(alertId);
-            if (alert) {
-                const bsAlert = new bootstrap.Alert(alert);
+            const alertElement = document.getElementById(alertId);
+            if (alertElement) {
+                // Crear instancia de bootstrap Alert para poder ocultarla con una transición
+                const bsAlert = new bootstrap.Alert(alertElement);
                 bsAlert.close();
             }
         }, 5000);
+        
+        // Eliminar el elemento del DOM después de que se oculte
+        document.getElementById(alertId).addEventListener('closed.bs.alert', function () {
+            this.remove();
+        });
     }
 
-    // Obtener icono para alerta
-    function getAlertIcon(type) {
-        const icons = {
-            'success': 'check-circle-fill',
-            'danger': 'exclamation-triangle-fill',
-            'warning': 'exclamation-triangle-fill',
-            'info': 'info-circle-fill'
-        };
-        return icons[type] || 'info-circle-fill';
+    // Mostrar alerta de éxito con Bootstrap Alert (igual que groups.html)
+    function showSuccessAlert(message) {
+        const alertId = 'alert-' + Date.now();
+        const alertHtml = `
+            <div id="${alertId}" class="alert alert-success alert-dismissible fade show mb-0" role="alert">
+                <strong><i class="bi bi-check-circle-fill me-2"></i>Éxito:</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        
+        const container = document.getElementById('alertContainer');
+        container.insertAdjacentHTML('beforeend', alertHtml);
+        
+        // Programar eliminación automática después de 5 segundos
+        setTimeout(() => {
+            const alertElement = document.getElementById(alertId);
+            if (alertElement) {
+                // Crear instancia de bootstrap Alert para poder ocultarla con una transición
+                const bsAlert = new bootstrap.Alert(alertElement);
+                bsAlert.close();
+            }
+        }, 5000);
+        
+        // Eliminar el elemento del DOM después de que se oculte
+        document.getElementById(alertId).addEventListener('closed.bs.alert', function () {
+            this.remove();
+        });
+    }
+
+    // Mostrar alerta de información con Bootstrap Alert
+    function showInfoAlert(message) {
+        const alertId = 'alert-' + Date.now();
+        const alertHtml = `
+            <div id="${alertId}" class="alert alert-info alert-dismissible fade show mb-0" role="alert">
+                <strong><i class="bi bi-info-circle-fill me-2"></i>Información:</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        
+        const container = document.getElementById('alertContainer');
+        container.insertAdjacentHTML('beforeend', alertHtml);
+        
+        // Programar eliminación automática después de 5 segundos
+        setTimeout(() => {
+            const alertElement = document.getElementById(alertId);
+            if (alertElement) {
+                // Crear instancia de bootstrap Alert para poder ocultarla con una transición
+                const bsAlert = new bootstrap.Alert(alertElement);
+                bsAlert.close();
+            }
+        }, 5000);
+        
+        // Eliminar el elemento del DOM después de que se oculte
+        document.getElementById(alertId).addEventListener('closed.bs.alert', function () {
+            this.remove();
+        });
     }
 });
